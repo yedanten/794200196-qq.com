@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title>lol</title>
+      <link href="/2018/11/10/lol/"/>
+      <url>/2018/11/10/lol/</url>
+      
+        <content type="html"><![CDATA[<p>Point: so file Ollvm encode.<br>read the fucking while code. nothing to say.</p><pre><code class="c">#include &quot;stdafx.h&quot;#include &lt;conio.h&gt;int APIENTRY WinMain(HINSTANCE hInstance,                     HINSTANCE hPrevInstance,                     LPSTR     lpCmdLine,                     int       nCmdShow){   // TODO: Place code here.    unsigned char data[24] = {        0x4E, 0x5A, 0x40, 0x72, 0x6F, 0x6C, 0x36, 0x38, 0x68, 0x56, 0x69, 0x49, 0x73, 0x38, 0x71, 0x6C,         0x58, 0x7E, 0x37, 0x7B, 0x36, 0x6D, 0x26, 0x74    };    unsigned char v24[25] = {0};    for (int i = 0; i &lt; sizeof(data); i++) {        static int a = 0;        for (int v4 = 0; v4 &lt; 256; v4++) {            v24[i] = (unsigned char)v4;            unsigned char v7 = 0;           if (a % 2 == 0)               v7 = (v24[i] &amp; 0x26 | ~v24[i] &amp; 0xD9) ^ 0xDE;           else               v7 = (v24[i] &amp; 0xF6) | ~v24[i] &amp; 9;            if (v7 == data[i])                break;        }        a++;    }    getch();    return 0;}</code></pre><blockquote><p>转自实验吧，原文作者实验吧ID Nius</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>输出没有输出的内容</title>
+      <link href="/2018/11/10/%E8%BE%93%E5%87%BA%E6%B2%A1%E6%9C%89%E8%BE%93%E5%87%BA%E7%9A%84%E5%86%85%E5%AE%B9/"/>
+      <url>/2018/11/10/%E8%BE%93%E5%87%BA%E6%B2%A1%E6%9C%89%E8%BE%93%E5%87%BA%E7%9A%84%E5%86%85%E5%AE%B9/</url>
+      
+        <content type="html"><![CDATA[<p>上来先看了下壳，没有。直接上IDA，发现原来是MAC系统下的东西，我没有MAC，看来要在IDA下一条路走到黑了。<br>进了IDA，如图：<br><img src="http://www.shiyanbar.com/UploadImage/2016/8/15/154270561877282701.png" alt="图1"><br>函数不多，松了口气。直接进start。<br><img src="http://www.shiyanbar.com/UploadImage/2016/8/15/154270563216620701.png" alt="图2"><br>似乎程序总体结构一览无余。先输入KEY，然后由两个sub进行KEY的变换，所得结果与aN进行比较。进KEY变换的两个sub看了下，第二个sub比较复杂。<br><img src="http://www.shiyanbar.com/UploadImage/2016/8/15/154270565461479201.png" alt="图3"><br>第二个sub我不上图了，简单说下，主要是多层循环控制结构，主要进行移位、或、与、取反、异或操作，没整明白。但仔细看下，发现对KEY的变换操作特别少，而且没有对aN的操作。aN在程序中初始状态如图。<br><img src="http://www.shiyanbar.com/UploadImage/2016/8/15/154270567168585801.png" alt="图4"><br>所以aN不是flag，这也正符合提示：没有输出的内容。接着往下看，下面还有个函数sub_100001530，输入参数是KEY经过第一个字串处理函数变换后的值。<br><img src="http://www.shiyanbar.com/UploadImage/2016/8/15/154270570588139101.png" alt="图5"><br>先对输入参数分别与两个字串进行变换，然后进入一个循环，访问网络并对字串进行处理。折腾很久，没有折腾出结果。后来网上找到一篇WP（<a href="http://www.secpulse.com/archives/39058.html），一切就清楚了，写这篇WP就是想把网上WP略过的东西说说。毕竟我是小菜，flag不是目的，学习才是目的。" target="_blank" rel="noopener">http://www.secpulse.com/archives/39058.html），一切就清楚了，写这篇WP就是想把网上WP略过的东西说说。毕竟我是小菜，flag不是目的，学习才是目的。</a><br>如果把sub_100001530的输入参数记作a,如网上的WP如说，在sub_100001480中用a的前6位与目标字串进行异或生成一个url，url的开头肯定是http://或者https://。这样就可以反推出a的前6位，并再得出url。而且还可以用a算出另一个字串的变换结果。直接上代码，两种可能性都算，一看便知真假。  </p><pre><code class="python"># -*- coding:utf-8 -*-# code by poyotendef main():  t1 = r&#39;http:/&#39;  t2 = r&#39;https:&#39;  #b为unk_1000020E0  b = [0x3c,0x44,0x19,0x11,0x7,0x55,0x7B,0x1F,0x0E,0x15,0x12,0x1B,0x3D,0x5D,\        0x8,0x4F,0x1B,0x1D,0x33,0x1F,0x8,0x17,0x11,0x1,0x20,0x1F]  #c为unk_100002100        c =  [0xF1,0x31,0x78,0x98,0xC0,0x62,0x50,0x7A,0xDA,0x62,0x70,0x9D,0xFE,0x2D,\        0x6E,0xC3,0xEE,0x7A,0x51,0xA,0xC8,0x74,0x74,0xE,0xC2,0x31,0x6D,0xBD,0xFB,\        0x6A,0x57,0x94,0xEC,0x6E,0x7C,0x77,0xF1,0x37,0x6F,0x95,0x3,0x56,0x57,0xD8,\        0xE0,0x6A,0x70,0x5D,0xCE,0x33,0x6F,0x61,0xD1,0x64,0x55,0x75,0xC7,0x66,0x74,\        0xC0,0xD5,0x3B,0x6E,0x19,0xE0,0x62,0x5C,0x18,0xDA,0x44,0x75,0x9A]  a1 = &#39;&#39;  a2 = &#39;&#39;  for i in range(6):    a1 += chr(ord(t1[i]) ^ b[i])    a2 += chr(ord(t2[i]) ^ b[i])  print a1,&#39;\t&#39;,a2  b1 = &#39;&#39;  b2 = &#39;&#39;  for i in range(len(b)):    b1 += chr((b[i]^ord(a1[i%len(a1)])))    b2 += chr((b[i]^ord(a2[i%len(a2)])))  c1 = []  c2 = []  for i in range(len(c)):    c1.append(c[i]^ord(a1[i%len(a1)]))    c2.append(c[i]^ord(a2[i%len(a2)]))  print b1,&#39;\n&#39;,b2,&#39;\n&#39;,c1,&#39;\n&#39;,c2if __name__ == &#39;__main__&#39;:  main()  print &#39;done&#39;  pass</code></pre><p>得出一个网址和一组数，代入sub_10000133进行运算，最终能得出flag。既然内容没有输出，我也没有MAC，那我们输出内容吧。代码如下，尽量保持了伪代码的原样。  </p><pre><code class="c">// poppy.cpp : Defines the entry point for the console application.//code by poyoten#include &quot;stdafx.h&quot;#include &lt;string.h&gt;#include &lt;stdio.h&gt;#include &lt;memory.h&gt;#include &lt;stdlib.h&gt;#include &lt;curl/curl.h&gt;#define  WIN32_LEAN_AND_MEAN#include &lt;windows.h&gt;size_t sub_1000011C0(void* a1, size_t a2, size_t a3, void* a4){  __int64 v4; // ST18_8@1  v4 = a3;      //memset(data, 0LL, 0x1000000LL);  int size = strlen((char*)a4);  int len = size_t(a3*a2);  if (size == 0)    strcpy_s((char*)a4, len+1, (char*)a1);  else    strcat_s((char*)a4, 0x1000000uLL, (char*)a1);  return size_t(a3*a2);}_int64 __fastcall sub_100001210(char* a1, char* a2){  CURL *curl; // ST38_8@1  CURLcode res;  //FILE* fp;  //if ((fp = fopen(&quot;1.htm&quot;, &quot;w&quot;)) == NULL)  //  return false;  //__memset_chk(a2, 0LL, 0x100000LL, -1LL);  curl_global_init(3LL);  curl = curl_easy_init();  curl_easy_setopt(curl, CURLOPT_URL, a1);  curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30LL);  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, sub_1000011C0);  //curl_easy_setopt(curl, CURLOPT_FILE, (FILE*)a2);  curl_easy_setopt(curl, CURLOPT_WRITEDATA, a2);  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0LL);  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0LL);  res = curl_easy_perform(curl);  curl_easy_cleanup(curl);  curl_global_cleanup();  return 0LL;}__int64 __fastcall sub_100001740(const char *a1, int a2, char *a3, int a4, int a5){  signed int v5; // eax@42  signed int v6; // eax@45  signed int v7; // eax@48  signed int v8; // eax@53  signed int v9; // eax@57  signed int v10; // eax@62  signed int v11; // eax@65  bool v13; // [sp+7Bh] [bp-45h]@0  signed int v14; // [sp+7Ch] [bp-44h]@1  char *v15; // [sp+80h] [bp-40h]@0  char *v16; // [sp+88h] [bp-38h]@0  int v17; // [sp+94h] [bp-2Ch]@0  int v18; // [sp+98h] [bp-28h]@1  int v19; // [sp+9Ch] [bp-24h]@1  char *v20; // [sp+A0h] [bp-20h]@1  signed int v21; // [sp+B8h] [bp-8h]@0  int v22; // [sp+BCh] [bp-4h]@1  v20 = a3;  v19 = a4;  v18 = a5;  v22 = a5;  v14 = 687849597;  do  {    while (v14 &gt; -721349906)    {      if (v14 &gt; -251959739)      {        if (v14 &gt; 1643955)        {          if (v14 &gt; 2139374635)          {            if (v14 == 2139374636)            {              v11 = 1996424361;              if (v17 &lt; v18)                v11 = -251959738;              v14 = v11;            }          }          else if (v14 &gt; 111058115)          {            if (v14 &gt; 319798562)            {              if (v14 &gt; 497514003)              {                if (v14 &gt; 687849596)                {                  if (v14 &gt; 1056727273)                  {                    if (v14 &gt; 1629186829)                    {                      if (v14 &gt; 1841852057)                      {                        if (v14 &gt; 1996424360)                        {                          if (v14 == 1996424361)                          {                            v21 = (DWORD)v15 - (DWORD)v20;                            v14 = -2127602345;                          }                        }                        else                        {                          switch (v14)                          {                          case 1841852058:                            v6 = 111058116;                            if (a2 &lt;= 0)                              v6 = 319798563;                            v14 = v6;                            break;                          case 1892047314:                            v8 = -721349905;                            if (v17 &lt; v18)                              v8 = 497514004;                            v14 = v8;                            v13 = 0;                            break;                          case 1914277125:                            v10 = 2139374636;                            if (!v15)                              v10 = -251959738;                            v14 = v10;                            break;                          }                        }                      }                      else if (v14 == 1629186830)                      {                        v16 += (signed int)v15 - (signed int)v16 + 1;                        v14 = 1643956;                      }                    }                    else if (v14 == 1056727274)                    {                      v17 = 0;                      v16 = v20;                      v14 = 1892047314;                    }                  }                  else if (v14 == 687849597)                  {                    v5 = 1841852058;                    if (v22 &lt;= 0)                      v5 = 319798563;                    v14 = v5;                  }                }                else if (v14 == 497514004)                {                  v15 = strstr(v16, a1);                  v14 = -721349905;                  v13 = v15 != 0LL;                }              }              else if (v14 == 319798563)              {                v21 = -1;                v14 = -2127602345;              }            }            else if (v14 == 111058116)            {              v7 = 1056727274;              if (v19 &lt;= 0)                v7 = 319798563;              v14 = v7;            }          }          else if (v14 == 1643956)          {            ++v17;            v14 = 1892047314;          }        }        else if (v14 == -251959738)        {          v21 = -1;          v14 = -2127602345;        }      }      else if (v14 == -721349905)      {        v9 = 1914277125;        if (v13)          v9 = 1629186830;        v14 = v9;      }    }  } while (v14 != -2127602345);  return (unsigned int)v21;}__int64 __fastcall sub_100001330(char* a1, unsigned int a2, int a3){  int v3; // ST70_4@1  char* v4; // ST60_8@1  int v5; // eax@1  int v6; // eax@1  int v7; // ST5C_4@1  const char *v8; // ST10_8@1  int v9; // eax@1  char v10; // ST4B_1@1  v3 = a3;  v4 = (char *)malloc(0x1000000uLL);  memset(v4, 0LL, 0x1000000LL);  //v4 = data;  sub_100001210(a1, v4);  v5 = strlen(v4);  v6 = sub_100001740(&quot;&lt;td&gt;&quot;, 4, v4, v5, a2);  v7 = v6;  v8 = &amp;v4[v6 + 4];  v9 = strlen(v8);  v10 = v4[(signed int)(v3 + (unsigned __int64)sub_100001740(&quot;\&quot;&gt;&quot;, 2, (char *)v8, v9, 1) + v7 + 4 + 2)];  free(v4);  return (unsigned int)v10;}int _tmain(int argc, _TCHAR* argv[]){  __int64 v1; // rcx@3  char v2; // al@3  __int64 v4; // [sp+0h] [bp-1F0h]@0  char *i; // [sp+70h] [bp-180h]@1  char *v6; // [sp+80h] [bp-170h]@3  char *v7; // [sp+C0h] [bp-130h]@1  char *v8; // [sp+1C0h] [bp-30h]@1  __int64 v9; // [sp+1E8h] [bp-8h]@1  char url[] = &quot;https://ctftime.org/event/&quot;;    char index[] = {165, 1, 21, 249, 180, 13, 4, 74, 183, 3, 4, 242, 170, 29, 3, 162, 154, 21, 5, 58, 165, 21, 0, 97, 150, 1, 0,     220, 143, 5, 3, 164, 129, 15, 8, 24, 165, 7, 2, 244, 119, 57, 3, 232, 141, 11, 4, 50, 154, 3, 2, 0, 165, 11, 1, 69, 170,    7, 0, 175, 129, 11, 3, 120, 148, 13, 8, 40, 183, 37, 1, 245,&#39;\0&#39; };  //memset(&amp;v8, 0, 0x20uLL);  //memset(&amp;v7, 0, 0x100uLL);  v7 = index;  v8 = url;  //strcpy(&amp;v8, url);  //strcpy(&amp;v7, index);  for (i = v7; *i; i += 4)  {    //memset(&amp;v6, 0, 0x40uLL);    v6 = (char *) malloc(0x100ULL);    WORD(v4) = (unsigned __int8) *i;    _snprintf(v6, 0x40uLL,  &quot;%s%d&quot;, v8, v4);    v1 = (unsigned __int8)*i;    v2 = sub_100001330(v6, (unsigned __int8)i[1], (unsigned __int8)i[2]);    printf(&quot;%c&quot;, v2);  }  return 0;}</code></pre><p>得出没有输出的内容。不过还有个格式，本题未说明白，原题说了。我不知道aN输出的是什么，也不想弄了。程序中是带有ISG字串的。不要问我怎么知道的。  </p><blockquote><p>转自实验吧，原文作者实验吧ID poyoten</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>tlc</title>
+      <link href="/2018/11/10/tlc/"/>
+      <url>/2018/11/10/tlc/</url>
+      
+        <content type="html"><![CDATA[<p>先用ida64打开tlc  </p><pre><code class="c">buf = 0LL;v10 = 0;memset(&amp;v8, 0, 0x400uLL);memset(&amp;s, 0, 0x400uLL);printf(&quot;Please input key: &quot;, a2, &amp;s);fflush(stdout);read(0, &amp;buf, 0xCuLL);sub_401241((const char *)&amp;buf);</code></pre><p>看到这个函数是对输入字符串进行rot13操作（核心语句：a1[v3] = (a1[v3] + 13) % (v4 + 26);）<br>sub_400EC7((<strong>int64)&amp;buf, (</strong>int64)&amp;s, 0xCuLL);<br>这个函数是进行base64解码操作（因为有base64的三段式位移  </p><pre><code class="c">v3 = 4 * (unsigned __int64)sub_400AAD(*(_BYTE *)(a1 + i));*(_BYTE *)(a2 + v14) = v3 | ((signed int)(sub_400AAD(*(_BYTE *)(i + 1 + a1)) &amp; 0x30) &gt;&gt; 4);v4 = 16 * (unsigned __int64)sub_400AAD(*(_BYTE *)(i + 1 + a1));*(_BYTE *)(v14 + 1 + a2) = v4 | ((unsigned __int8)sub_400AAD(*(_BYTE *)(i + 2 + a1)) &gt;&gt; 2);v5 = (unsigned __int8)sub_400AAD(*(_BYTE *)(i + 2 + a1)) &lt;&lt; 6;*(_BYTE *)(v14 + 2 + a2) = v5 | (unsigned __int64)sub_400AAD(*(_BYTE *)(i + 3 + a1));）  v3 = strlen(&amp;s);  sub_4006B6((__int64)&amp;s, v3);</code></pre><p>这里是一个判断函数，如果不满足条件则直接exit  </p><pre><code class="c">v4 = 10 * v4 + *(_BYTE *)(i + a1) - 48;if ( v4 % (i + 1) )  exit(1);</code></pre><p>从形式上看，输入很可能是数字，因为每个输入的ascii码与“0”的相减，然后按位检查是否能够整除  </p><pre><code class="c">v11 = malloc(0x108uLL);v4 = strlen(&amp;s);sub_400877((__int64)v11, (__int64)&amp;s, v4);# 这里就是各种操作，只要能过判断函数，都能解得一个结果，就是看是否有意义而已v5 = strlen(::s);sub_400A1B((__int64)v11, (__int64)&amp;v8, (__int64)::s, v5);printf(&quot;Text is: %s\n&quot;, &amp;v8);return 0LL;</code></pre><p>所以综上：首先输入然后rot13,然后base64解码,然后做了一个判断(高n位能被n整除),最后用输入作为密钥解密一段数据,得到flag。  </p><blockquote><p>转自实验吧，原文作者实验吧ID canic</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>NSCTF Reverse 500</title>
+      <link href="/2018/11/10/NSCTF-Reverse-500/"/>
+      <url>/2018/11/10/NSCTF-Reverse-500/</url>
+      
+        <content type="html"><![CDATA[<p>题目给的提示是pyc的反编译<br>于是去找pyc反编译的工具 ，<br>使用<code>Easy Python Decompiler</code>反编译，得到报错  </p><pre><code class="Assembly">Syntax error at or near `NOP&#39; token at offset 0# decompiled 0 files: 0 okay, 1 failed, 0 verify failedParserError: --- This code section failed: ---NOP &#39;&#39;LOAD_CONST &quot;M,\x1d-\x18}E&#39;\x1ezN~\x1b*\x19+\x12%\x1d-&quot;LOAD_CONST &quot;M,\x1d-\x18}E&#39;\x1ezN~\x1b*\x19+\x12%\x1d-&quot;NOP &#39;&#39;LOAD_CONST &quot;M,\x1d-\x18}E&#39;\x1ezN~\x1b*\x19+\x12%\x1d-&quot;LOAD_CONST &#39;I\x7fM(I{I\x7fJ.\x16wWcRj\x0e6\x0fn&#39;</code></pre><p>参考 Python字节码指令集 有 0x09(009): NOP<br>根据 报错 将 09 64 改成 01 64 但得到的代码不全  </p><pre><code class="python"># File: R (Python 2.7)&quot;M,\x1d-\x18}E&#39;\x1ezN~\x1b*\x19+\x12%\x1d-&quot;data = &quot;M,\x1d-\x18}E&#39;\x1ezN~\x1b*\x19+\x12%\x1d-&quot; + &#39;I\x7fM(I{I\x7fJ.\x16wWcRj\xe6\xfn&#39; + &#39;Zo\nn\xfk\t1R7\x3g\x67\x0eUb\x43&#39; + &#39;\x14\x71Rr\x14x\x19~D?q&quot;a5s,A%&#39; + &quot;\x10&#39;\x11uLyA%\x1d|DrFv\x12t\x11#B&amp;&quot; + &#39;GsKzK*O)\x1c%GuC&gt;\x1e\x7f\x1b+\x19*&#39; + &#39;\x1e&amp;\x14-\x1f/\x1axAqBq@yO-LtE}&#39; + &#39;\x1b,MuBp\x12&#39;import osimport sysimport structimport cStringIOimport stringimport disimport marshalimport typesimport randomcount = 0def reverse(string):  return string[::-1]data_list = list(reverse(data)[1:])def decrpyt(c, key2):  global count  data_list[count] = c ^ key2  count += 1def GetFlag1():  key = struct.unpack(&#39;B&#39;, data[len(data) - 8])[0]  for c in data_list:  if count == 0:  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  continue  key = struct.unpack(&#39;B&#39;, data[len(data) - 3])[0]  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  for c in data_list[::-1]:  print chr(c),def GetFlag2():  key = struct.unpack(&#39;B&#39;, data[len(data) - 11])[0]  for c in data_list:  if count == 0:  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  continue  key = struct.unpack(&#39;B&#39;, data[len(data) - 4 - count])[0]  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  for c in data_list[::-1]:  print chr(c),def GetFlag3():  key = struct.unpack(&#39;B&#39;, data[len(data) - 5])[0]  for c in data_list:  if count == 0:  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  continue  key = struct.unpack(&#39;B&#39;, data[len(data) - 2 - count])[0]  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  for c in data_list[::-1]:  print chr(c),def GetFlag4():  global count  key = struct.unpack(&#39;B&#39;, data[len(data) - 1])[0]  for c in data_list:  if count == 0:  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  continue  key = struct.unpack(&#39;B&#39;, data[len(data) - 1 - count])[0]  decrpyt(struct.unpack(&#39;B&#39;, c)[0], key)  count = 0  for c in data_list[::-1]:  print chr(c),def GetFlag5():  pass# WARNING: Decompyle incompleteGetFlag1()</code></pre><p>编写 解析data的程序 ，但到解析 第二个字符串时开始 报 ValueError: invalid \x escape  </p><p>发现 Decompyle++ 在处理 例如 0f aa 这样的指令时也会变成 <code>\xfa\xa</code><br>所以手动获取 data  </p><pre><code class="python">data = &quot;4D2C1D2D187D45271E7A4E7E1B2A192B12251D2D497F4D28497B497F4A2E16775763526A0E360F6E5A6F0A6E0F6B09315237036706370065556204330134073152721478197E443F71226135732C4125102711754C7941251D7C4472467612741123422647734B7A4B2A4F291C254775433E1E7F1B2B192A1E26142D1F2F1A784171427140794F2D4C74457D1B2C4D75427012&quot;.decode(&#39;hex&#39;)</code></pre><p>依次尝试 GetFlag<br>在 GetFlag4 中得到 flag  </p><blockquote><p>转自实验吧，原文作者实验吧ID 笛声悠悠-思绪万千</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>NSCTF Reverse 400</title>
+      <link href="/2018/11/10/NSCTF-Reverse-400/"/>
+      <url>/2018/11/10/NSCTF-Reverse-400/</url>
+      
+        <content type="html"><![CDATA[<p>题目给了个py打包的exe，提示py2exe<br>这里安利一个工具<code>pyinstaller extractor</code>，可以将<code>pyinstaller</code>打包的pyexe还原回去<br>提前出来的源码如下<br><img src="http://gitbookfordt.test.upcdn.net/py2exere.png" alt="图"><br>看到flag明文，贼激动，提交GG……<br>跟一边buf过程，十六进制打出来和data特别像，猜测应该是根据加密算法，逆推解密，data已知，给出解密过程  </p><pre><code class="python">data = &quot;\x1c\x7a\x16\x77\x10\x2a\x51\x1f\x4c\x0f\x5b\x1d\x42\x2f\x4b\x7e\x4a\x7a\x4a\x7b&quot; +&quot;\x49\x7f\x4a\x7f\x1e\x78\x4c\x75\x10\x28\x18\x2b\x48\x7e\x46\x23\x12\x24\x11\x72&quot; +&quot;\x4b\x2e\x1b\x7e\x4f\x2b\x12\x76\x0b&quot;data = list(data)print len(data)for x in range(0, 48):  data[x] = chr(ord(data[x]) ^ ord(data[x+1]))data[48] = chr(ord(data[48]) ^ 0x0b)print &#39;&#39;.join(data)</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>bin100(ebCTF 2013)</title>
+      <link href="/2018/11/09/bin100-ebCTF-2013/"/>
+      <url>/2018/11/09/bin100-ebCTF-2013/</url>
+      
+        <content type="html"><![CDATA[<p>用od加载之后查找字符串可以看到要求你扔出3-1-3-3-7的骰子，这再拼运气前面4次全扔中，你最后一个也不可能把一个最大就只有6的骰子扔个7出来<br>换个想法，找到错误跳转jnz，让它不管错误还是正确都不跳转就行了，用nop填充掉然后运行5次回车后就可以输出flag了<br>注意有基于时间的反调试，填充完保存到可执行文件，在外面命令行运行即可  </p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Keylead（ASIS CTF 2015）</title>
+      <link href="/2018/11/09/Keylead%EF%BC%88ASIS-CTF-2015%EF%BC%89/"/>
+      <url>/2018/11/09/Keylead%EF%BC%88ASIS-CTF-2015%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<p>sub_4006B6输出了flag，静态分析不方便，IDA+Remote动态调，防止输出flag时用到了期望骰子加入计算，还是要什么给什么3，1，3，3，7。还加了时间验证防作弊，改跳转。  </p><pre><code class="c">signed __int64 __fastcall main(__int64 a1, char **a2, char **a3){  char v3; // ST1F_1@1  unsigned int v4; // eax@1  int v5; // ST18_4@1  int v6; // ST14_4@1  signed __int64 result; // rax@6  int v8; // [sp+4h] [bp-1Ch]@1  int v9; // [sp+8h] [bp-18h]@1  int v10; // [sp+Ch] [bp-14h]@1  int v11; // [sp+10h] [bp-10h]@1  puts(&quot;hi all ----------------------&quot;);  puts(&quot;Welcome to dice game!&quot;);  puts(&quot;You have to roll 5 dices and get 3, 1, 3, 3, 7 in order.&quot;);  puts(&quot;Press enter to roll.&quot;);  v3 = getchar();  v4 = time(0LL);  srand(v4);  v5 = time(0LL);  v6 = rand() % 6 + 1;  v11 = rand() % 6 + 1;  v10 = rand() % 6 + 1;  v9 = rand() % 6 + 1;  v8 = rand() % 6 + 1;  printf(    &quot;You rolled %d, %d, %d, %d, %d.\n&quot;,    (unsigned int)v6,    (unsigned int)v11,    (unsigned int)v10,    (unsigned int)v9,    (unsigned int)v8);  if ( v6 != 3 || (time(0LL), v11 != 1) || (time(0LL), v10 != 3) || (time(0LL), v9 != 3) || (time(0LL), v8 != 7) )  {    puts(&quot;You DID NOT roll as I said!&quot;);    puts(&quot;Bye bye~&quot;);    result = 0xFFFFFFFFLL;  }  else  {    time(0LL);    puts(&quot;You rolled as I said! I&#39;ll give you the flag.&quot;);    sub_4006B6();    result = 0LL;  }  return result;}</code></pre><p><img src="http://www.shiyanbar.com/UploadImage/2016/6/11/153681063799832601.png" alt="图1"></p><blockquote><p>转自实验吧，原文作者实验吧ID czr27</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>reversemeplz</title>
+      <link href="/2018/11/09/reversemeplz/"/>
+      <url>/2018/11/09/reversemeplz/</url>
+      
+        <content type="html"><![CDATA[<p>求逆函数  </p><pre><code class="c">#include &lt;stdio.h&gt;#include &lt;string.h&gt;#define LOBYTE(x) (((char*)&amp;x)[0])char book[256] = {0,94,24,84,113,76,8,68,48,126,24,124,81,68,8,102,80,92,88,84,48,76,24,68,48,124,24,116,16,68,24,100,0,94,120,84,113,126,123,84,48,126,24,124,89,126,8,102,64,92,120,20,48,76,104,4,32,60,24,116,8,12,8,100,44,110,47,124,121,108,40,108,125,126,127,124,121,108,105,110,115,100,117,102,48,108,57,110,51,100,53,116,16,76,16,108,36,110,111,112,113,114,115,116,117,118,119,120,121,122,97,98,99,100,101,102,103,104,105,106,107,108,109,124,79,72,72,104,0,94,24,84,113,76,8,68,48,126,24,124,81,68,8,102,80,92,88,84,48,76,24,68,48,124,24,116,16,68,24,100,0,94,120,84,113,126,123,84,48,126,24,124,89,126,8,102,64,92,120,20,48,76,104,4,32,60,24,116,8,12,8,100,44,110,47,124,121,108,40,108,125,126,127,124,121,108,105,110,115,100,117,102,48,108,57,110,51,100,53,116,16,76,16,108,36,110,111,112,113,114,115,116,117,118,119,120,121,122,97,98,99,100,101,102,103,104,105,106,107,108,109,124,79,72,72,104};unsigned char unk_8048980[60]={255,255,255,255,17,0,0,0,245,255,255,255,3,0,0,0,248,255,255,255,5,0,0,0,14,0,0,0,253,255,255,255,1,0,0,0,6,0,0,0,245,255,255,255,6,0,0,0,248,255,255,255,246,255,255,255,0,0,0,0};bool __cdecl sub_8048801(char *flag){  int v1; // edi@1  int v2; // esi@1  char v3; // al@6  int cnt; // eax@10  char baseVector[100]={0};  char v7=(char)(baseVector+3); // [sp+3h] [bp-59h]@13  char v8=(char)(baseVector+4); // [sp+4h] [bp-58h]@6  char v9=(char)(baseVector+5); // [sp+5h] [bp-57h]@16  int* v10=(int*)((char*)baseVector+16); // [sp+10h] [bp-4Ch]@13  char v11=(char)(baseVector+20); // [sp+14h] [bp-48h]@1  memcpy(&amp;v11, &amp;unk_8048980, 0x3Cu);  v1 = 0;  v2 = 0;  *flag = 111;  do  {    if ( flag[v2] &lt;= 96 )      flag[v2] = 0;    if ( flag[v2] &gt; 122 )      flag[v2] = 24;    v3 = book[flag[v2]];    *(&amp;v8 + v2) = v3;    if ( (unsigned char)v3 &gt; 0xCCu &amp;&amp; v3 != -49 )      v1 = 1;    ++v2;  }  while ( v2 != 15 );  cnt = 0;    while ( 1 )    {      ++cnt;       *(&amp;v8 + cnt) =(unsigned char)(*(&amp;v8 + cnt - 1) + (*(int*)((int*)unk_8048980+cnt-1)));    printf(&quot;%c&quot;,book[*(&amp;v8 + cnt)]);      if ( cnt == 14 )      {        return 0;      }    }  *(&amp;v8 +cnt) = *(&amp;v8 +cnt);}int main(){  char x[16]=&quot;ooooooooooooooo&quot;;  unsigned char i;  printf(&quot;flag{&quot;);  sub_8048801(x);  printf(&quot;}&quot;);  return 0;}</code></pre><blockquote><p>转自实验吧，原文作者实验吧ID czr27</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>wzezDingDing</title>
+      <link href="/2018/11/09/wzezDingDing/"/>
+      <url>/2018/11/09/wzezDingDing/</url>
+      
+        <content type="html"><![CDATA[<p>这个题目是一个64位的驱动，在ida里分析了一下。<br>首先找到正常的驱动分发函数里，看看这个驱动都完成什么功能。下面是驱动分发函数中，比较iocontrol code的地方。<br><img src="https://img-blog.csdn.net/20141121132402953" alt="图1"><br>然后进入每个处理分支，观察一下都做了什么。发现每个分支都有一个特点，满足相应的条件判断，就会将全局变量dword_148E0某位置为F。  </p><p>比如： 88102004这个分支，当从ring3输入字符串为”^lejAJ]O”  “MNIII” 时，会分别置dword_148E0第六位 第五位为F，两次在ring3调用DeviceIoControlcode即可。<br>后面的分支每次按条件要求，依次在ring3调用DeviceIoControlcode， 让驱动走完每个iocontrol code的处理分支。<br>注意：8810200c的分支是判断ring3的映像文件名是否含有HCTF这几个字符。<br>流程还需要走一个其它分支，这里就选择了0x88102014，就是jmp loc12788，这个分支会给第一位置F<br>接着写个ring3的程序，跑一下看看什么情况  </p><pre><code class="ring3">  HANDLE hDev = CreateFile(&quot;\\\\.\\Hctf&quot;,GENERIC_READ |GENERIC_WRITE,FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,OPEN_EXISTING ,0, NULL);  DWORD code=0;  DWORD dwShellcodeSize=0x104;  char InBuf[] = &quot;^lejAJ]O&quot;;  char mniii[]=&quot;MNIII&quot;;  char ret[]=&quot;\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3&quot;;  char OutBuf[0x100]={0};  DWORD dwRetBytes  = 0;  char OutBuf2[0x100]={0};  DeviceIoControl(hDev, 0x88102004,InBuf, 0x9, OutBuf, 0x100, &amp;dwRetBytes, 0);  DeviceIoControl(hDev, 0x88102004,mniii, 0x6, OutBuf, 0x100, &amp;dwRetBytes, 0);  DeviceIoControl(hDev, 0x88102008,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);  DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);  DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);  DeviceIoControl(hDev, 0x88102014,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);  DeviceIoControl(hDev, 0x88102010,ret, 16, OutBuf2, 0x100, &amp;dwRetBytes, 0);  CloseHandle(hDev);</code></pre><p>发现驱动直接crash在下面这个call里，调用到栈上的一个地址<br><img src="https://img-blog.csdn.net/20141121160856750" alt="图2"><br>到这就太想吐槽了，crash在这后，发现里面有一部分代码，还有类似循环的代码，还以为要怎么补成一个计算flag的算法，尼玛最后知道就是补成栈平衡就行，真是没做过ctf啊，太天真了。。<br>从ring3传进来的，然后在驱动里补齐。如下图所示这段代码<br><img src="https://img-blog.csdn.net/20141121160921549" alt="图3"><br>需要填补上<code>\x50\x41\x50\x48\x83\xec\x28\x59\xc3</code>使堆栈平衡<br>加上hctf{}格式就是flag了  </p><blockquote><p>转自CSDN博客，<a href="https://blog.csdn.net/trap0d/article/details/41346749" target="_blank" rel="noopener">原链接</a></p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>这个FLAG有点怪</title>
+      <link href="/2018/11/09/%E8%BF%99%E4%B8%AAFLAG%E6%9C%89%E7%82%B9%E6%80%AA/"/>
+      <url>/2018/11/09/%E8%BF%99%E4%B8%AAFLAG%E6%9C%89%E7%82%B9%E6%80%AA/</url>
+      
+        <content type="html"><![CDATA[<p>APK文件丢apktool里，拆包，转jar，看源码<br><img src="http://gitbookfordt.test.upcdn.net/zgflag001.png" alt="图1"><br>注意这个func函数，我们要跟进去，但是func是加载so得到的<br>IDA打开so文件，去找func，但是！！！没有！！！<br>好的，我忍！<br>dex加载so的时候，首先会导出函数中查找JNI_Onload函数，默认情况下，不需要我们管，但是可以重写JNI_Onload进行注册函数<br>我们去找JNI_Onload函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag002.png" alt="图2"><br>点进去发现func字样，下面的函数是<code>_cxa_begin_match</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag003.png" alt="图3"><br>点击跟进F5<br>从上到下看，出现第一个奇怪的函数<code>gun_arm_fini_29</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag004.png" alt="图4"><br>点击跟进去，知道功能为读取字符串用的<br><img src="http://gitbookfordt.test.upcdn.net/zgflag005.png" alt="图5"><br>返回继续分析源码<br>中间有很多东西，是关于调用线程和检测程序的，总的来说就是一种简单的对抗gdb调试的思路吧！（猜的）<br><img src="http://gitbookfordt.test.upcdn.net/zgflag006.png" alt="图6"><br>然后继续看，我们刚刚输入的字符串进行了一个抑或加密，加密是以如下方式text[i]=text[i]^(i+1)进行的<br><img src="http://gitbookfordt.test.upcdn.net/zgflag007.png" alt="图7"><br>然后我们继续看如下语句<br><img src="http://gitbookfordt.test.upcdn.net/zgflag008.png" alt="图8"><br>这几个变量m_y，tempSt，tempabc貌似都没有定义啊！去init段找找吧<br>查看init段，发现函数<code>_cxa_chk_fail</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag009.png" alt="图9"><br>跟进去看<br>关键代码在这，跟进<code>sub_1A74</code>函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag010.png" alt="图10"><br>这些变量类似于全局变量在这里被注册，在这里对m_y和tempabc进行了初始定义<br>m_y的值为6<br>tempabc的值为syc<br>tempabc赋值进过了一次<code>gun_Unwind1</code>函数，跟进去代码很简单，就是逐位转ascii后-2，在转回字符返回，偷个懒不截图了  </p><p>然后回到_cxa_begin_match继续跟踪逻辑，这里调用了一个<code>imp_Unwind_k</code>函数<br>进去查看<br><img src="http://gitbookfordt.test.upcdn.net/zgflag011.png" alt="图11"><br>可以看到是把穿进去的字符串右移6位，赋值给tempStr<br>至此，刚刚上面3个未定义的变量值就都确定了<br>回<code>_cxa_begin_match</code>函数，看下一句<code>gun_armfini_33</code>函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag012.png" alt="图12"><br>关键代码<br><img src="http://gitbookfordt.test.upcdn.net/zgflag013.png" alt="图13"><br>大概作用就是，把<code>tempabc</code>中的大写字母转小写，<code>tempStr</code>字符串则是移位2位，赋值给v15……【逻辑看的头疼】<br>然后下面返回<code>imp_Unwind_j</code>函数，继续跟进去看<br><img src="http://gitbookfordt.test.upcdn.net/zgflag014.png" alt="图14"><br>分析,第一个if段，确定tempStr角标0 1 2 3 9 10的值，分析过程<br>角标1和2的值相同，为111，转字符为<code>o</code><br>其他的根据判断条件，设角标9为x，可得方程<code>(2*(x-1)-29)+(2*(x-1))+x+(x+31)-304==0</code>，解方程x=51，python有个库为sympy，快速解方程  </p><pre><code class="python">from sympy import *x=Symbol(&#39;x&#39;)print(solve((2*(x-1)-29)+(2*(x-1))+x+(x+31)-304, x))</code></pre><p>至此tempStr的值如下</p><pre><code class="string">tempStr[0] = &#39;G&#39;tempStr[1] = &#39;o&#39;tempStr[2] = &#39;o&#39;tempStr[3] = &#39;d&#39;tempStr[4] = &#39;&#39;tempStr[5] = &#39;&#39;tempStr[6] = &#39;&#39;tempStr[7] = &#39;&#39;tempStr[8] = &#39;&#39;tempStr[9] = &#39;3&#39;tempStr[10] = &#39;R&#39;</code></pre><p>继续看第二个if条件，循环5次，分别计算出角标4~8的值，角标值异或0x11在加循环次数【次数从0开始算】要等于V6，V6的值根据&amp;szCmp得到，每次循环该地址加4<br>szCmp的值双击跟进去直接看到分别为 <code>R d r u ^</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag015.png" alt="图15"><br>最终得到tempStr的值为<code>GoodCracK3R</code>  </p><p>回到<code>_cxa_begin_match</code>函数继续分析<br>看接下来的if段，注意这里的<code>desc</code>和<code>src</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag017.png" alt="图17"><br>去看变量定义<br><img src="http://gitbookfordt.test.upcdn.net/zgflag016.png" alt="图16"><br>字符串s其实就是我们要找的，目前已经能确定出前11位<code>GoodCracK3R</code>，src是角标8的首地址，v21和s相差11，作为结束位置<br>11位之后的值将赋值给<code>dest</code><br>并且这里我们给seed赋值，他的位置正好是加密后串（s串的第9、10、11位，也就是K3R）这个seed后面有用！之后进入gun_armfini_21函数，首先是进入<code>gun_armfini_23</code>函数，这里利用了seed值对v8生成了一个256长度的int数组！<br><img src="http://gitbookfordt.test.upcdn.net/zgflag018.png" alt="图18"><br>用python还原一下逻辑</p><pre><code class="python">def make(str,lens):    a=[]    for i in range(256):        a.append(i)    pos=0    pos_temp=0    for i in range(256):        temp = a[i]        pos_temp=(ord(str[pos])+a[i]+pos_temp)&amp;0xff        a[i]=a[pos_temp]        a[pos_temp]=temp        pos=((pos+1)%lens)&amp;0xff    return a</code></pre><p>然后我们这个v8数组后面还会用到。之后进入gun_armfini_36函数，这个函数主要就是对11位之后的字符串进行了处理<br><img src="http://gitbookfordt.test.upcdn.net/zgflag019.png" alt="图19">  </p><p>然后我们还是回到<code>_cxa_begin_match</code>函数！接近结束了！<br>我们看到是用sprintf函数对v18进行赋值（用11位以后，加密过的字符）然后进入<code>gun_arm_ldiv0</code>函数去匹配！<br><img src="http://gitbookfordt.test.upcdn.net/zgflag020.png" alt="图20"><br>调用了<code>gun_Unwind</code>函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag021.png" alt="图21"><br>继续跟进去<br><img src="http://gitbookfordt.test.upcdn.net/zgflag022.png" alt="图22"><br>功能就是把字符串转ascii逐位-2<br>最后我们看看它在做什么？11位之后的内容，进过加密，以16进制形式输出</p><pre><code class="string">0xa80xe50x580x8f0x7e0x030xf70x58</code></pre><p>然后根据上面的分析，我们就可以得到gun_armfini_33加密以后后八位的字符串是啥了！  </p><pre><code class="python">def test():    a=make(&#39;K3R&#39;,3)    value=[0xa8,0xe5,0x58,0x8f,0x7e,0x03,0xf7,0x58]    temp1=0    temp2=0    temp3=0    flag=&#39;&#39;    print a    for i in value:        temp1=(temp1+1)&amp;0xff        temp2=a[temp1]        temp3=(temp3+temp2)&amp;0xff        a[temp1]=a[temp3]        a[temp3]=temp2        flag+=chr(i^a[(a[temp1]+temp2)&amp;0xff])    print flag</code></pre><p>得到<code>GoodCracK3R;{0jN|B6</code><br>接下来只需要逆向一下gun_armfini_33函数，再移位回去再抑或一下就得到答案了！解密程序如下  </p><pre><code class="python">ppp=&quot;GoodCracK3R;{0jN|B6&quot;key = &#39;syc&#39;flag=[]for i in ppp:    flag.append(ord(i))print flagfor j in range(len(flag)):    if flag[j]&gt;=ord(&#39;a&#39;) and flag[j]&lt;=ord(&#39;z&#39;):        flag[j]=(flag[j]-97+26-ord(key[j%3])+97)%26+97    elif flag[j]&gt;=ord(&#39;A&#39;) and flag[j]&lt;=ord(&#39;Z&#39;):        flag[j]=(flag[j]-65+26-ord(key[j%3])+97)%26+65newflag=&#39;&#39;for i in range(6,6+len(flag)):    newflag+=chr(flag[i%len(flag)]^(i-5))print newflag</code></pre><p>得到FLAG <code>xctf{hgJ7Q=|8a\wV;A~}}Wc}</code></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>有一个程序加密得如下</title>
+      <link href="/2018/11/09/%E6%9C%89%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F%E5%8A%A0%E5%AF%86%E5%BE%97%E5%A6%82%E4%B8%8B/"/>
+      <url>/2018/11/09/%E6%9C%89%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F%E5%8A%A0%E5%AF%86%E5%BE%97%E5%A6%82%E4%B8%8B/</url>
+      
+        <content type="html"><![CDATA[<p>题目只给了一串类似乱码的字符串<br><code>0be6770IigHXZpz9hQYR1fpl15R0z9MUalmYEPhJeEN/sRklL6wQw5yQ7SAyT6tKGJNY0AxnyzS/L7zWQII=</code><br>程序是.pyc<br>利用工具将pyc转成py<br>工具名EasyPythonDecompiler<br><img src="http://gitbookfordt.test.upcdn.net/pycrev300.png" alt="图1"><br>得到如下代码</p><pre><code class="python"># Embedded file name: ./rev200.pyimport sysfrom hashlib import md5import base64from time import timefrom datetime import datetimeUC_KEY = &#39;123456789&#39;def authcode(string, operation = &#39;DECODE&#39;, key = UC_KEY, expiry = 0):    ckey_length = 4    if key == &#39;&#39;:        key = md5(UC_KEY.encode(&#39;utf-8&#39;)).hexdigest()    else:        key = md5(key.encode(&#39;utf-8&#39;)).hexdigest()    keya = md5(key[0:16].encode(&#39;utf-8&#39;)).hexdigest()    keyb = md5(key[16:32].encode(&#39;utf-8&#39;)).hexdigest()    if ckey_length == 0:        keyc = &#39;&#39;    elif operation == &#39;DECODE&#39;:        keyc = string[0:ckey_length]    elif operation == &#39;ENCODE&#39;:        keyc = md5(str(datetime.now().microsecond).encode(&#39;utf-8&#39;)).hexdigest()[-ckey_length:]    else:        return    cryptkey = keya + md5((keya + keyc).encode(&#39;utf-8&#39;)).hexdigest()    key_length = len(cryptkey)    if operation == &#39;DECODE&#39;:        string = base64.b64decode(string[ckey_length:])    elif operation == &#39;ENCODE&#39;:        if expiry == 0:            string = &#39;0000000000&#39; + md5((string + keyb).encode(&#39;utf-8&#39;)).hexdigest()[0:16] + string        else:            string = &#39;%10d&#39; % (expiry + int(time())) + md5((string + keyb).encode(&#39;utf-8&#39;)).hexdigest()[0:16] + string    else:        return    string_length = len(string)    result = &#39;&#39;    box = range(256)    rndkey = [0] * 256    for i in range(256):        rndkey[i] = ord(cryptkey[i % key_length])    j = 0    for i in range(256):        j = (j + box[i] + rndkey[i]) % 256        tmp = box[i]        box[i] = box[j]        box[j] = tmp    a = j = 0    for i in range(string_length):        a = (a + 1) % 256        j = (j + box[a]) % 256        tmp = box[a]        box[a] = box[j]        box[j] = tmp        result += chr(ord(string[i]) ^ box[(box[a] + box[j]) % 256])    if operation == &#39;DECODE&#39;:        if not result[0:10].isdigit() or int(result[0:10]) == 0 or int(result[0:10]) - int(time()) &gt; 0:            if result[10:26] == md5(result[26:].encode(&#39;utf-8&#39;) + keyb).hexdigest()[0:16]:                return result[26:]            else:                return &#39;&#39;        else:            return &#39;&#39;    else:        return keyc + base64.b64encode(result)if __name__ == &#39;__main__&#39;:    if len(sys.argv) &lt; 3:        exit(1)    ex = 20    for i in range(1, len(sys.argv), 2):        a = sys.argv[i]        b = sys.argv[i + 1]        if a == &#39;-t&#39;:            ex = int(b)        elif a == &#39;-e&#39;:            encoded = authcode(b, &#39;ENCODE&#39;, expiry=ex)            print encoded        elif a == &#39;-d&#39;:            decoded = authcode(b, &#39;DECODE&#39;, expiry=ex)            print decoded</code></pre><p>分析源码，执行的时候加入-d参数，值为题目给的乱码，但是返回的却是空<br>注意该段  </p><pre><code class="python">if operation == &#39;DECODE&#39;:        if not result[0:10].isdigit() or int(result[0:10]) == 0 or int(result[0:10]) - int(time()) &gt; 0:            if result[10:26] == md5(result[26:].encode(&#39;utf-8&#39;) + keyb).hexdigest()[0:16]:                return result[26:]            else:                return &#39;&#39;        else:            return &#39;&#39;    else:        return keyc + base64.b64encode(result)</code></pre><p>我们直接修改源码，跳过判断，在if之前直接print string，执行可得到  </p><pre><code class="string">1429861566556d9f4f29671810DUTCTF{2u0_chu_14i_d3_5hi_h3n74i}</code></pre><p>得到flag值<code>DUTCTF{2u0_chu_14i_d3_5hi_h3n74i}</code></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>证明自己吧</title>
+      <link href="/2018/11/09/%E8%AF%81%E6%98%8E%E8%87%AA%E5%B7%B1%E5%90%A7/"/>
+      <url>/2018/11/09/%E8%AF%81%E6%98%8E%E8%87%AA%E5%B7%B1%E5%90%A7/</url>
+      
+        <content type="html"><![CDATA[<h1 id="OD法"><a href="#OD法" class="headerlink" title="OD法"></a>OD法</h1><p>标准的C语言逆向分析程序，只要一路跟进CALL就能找到密码算法的位置并分析流程就可以了。<br>找到算法CALL跟进后就会注意到一个指令：REPNE SCAS BYTE PTR ES:[EDI]<br>这也是本例子唯一困惑我的地方，查了一下这条指令的用法，发现他其实是结合not ecx和sub edi，ecx计算输入字符串长度的，要求是长度为14位<br><img src="http://www.shiyanbar.com/UploadImage/2016/9/10/154507178914741901.png" alt="图1">  </p><p>当输入长度为14位密码时，进入密码运算步骤，如下图关键循环处，在这里只对输入的密码简单的采用了xor 20的运算，得到一组新的序列，存回原地址<br><img src="http://www.shiyanbar.com/UploadImage/2016/9/10/154507198450387801.png" alt="图2">  </p><p>读取一段栈区的14字节数据，并每个进行ADD BF运算，结果取出一个字节组成一个新的14字节数据(这段14byte数据没注意怎么来的，有兴趣的可以自己跟一下)<br><img src="http://www.shiyanbar.com/UploadImage/2016/9/10/154507237343174301.png" alt="图3">  </p><p>用处理过的输入密码和上面处理过的14字节数据进行逐个比较，全部正确则验证通过。也就是说，输入的密码(ascii码)XOR 20h要等于以下的14个字节数据。  </p><p>63 52 14 43 4B 69 53 73 4F 65 14 53 59 01  </p><p>所以对这14个字节X0R 20h就能还原出原始密码！</p><blockquote><p>转自实验吧，原文作者实验吧ID kyogre6105</p></blockquote><h1 id="IDA法"><a href="#IDA法" class="headerlink" title="IDA法"></a>IDA法</h1><p><img src="http://gitbookfordt.test.upcdn.net/zmzj001.png" alt="图4"><br>ida直接看出验证算法在if里的sub函数里<br>打开看啊看。。<br><img src="http://gitbookfordt.test.upcdn.net/zmzj002.png" alt="图5"><br>看到v5到v7定义了一堆诡异的数据<br><img src="http://gitbookfordt.test.upcdn.net/zmzj003.png" alt="图6"><br>因该是加密的数据<br>再看看算法<br>先输入a1，求长度，异或0x20<br>在比较<br>所以只要吧那堆数据减五异或20就可以了  </p><blockquote><p>转自实验吧，原文作者实验吧ID Zarcs</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>此处无声</title>
+      <link href="/2018/11/09/%E6%AD%A4%E5%A4%84%E6%97%A0%E5%A3%B0/"/>
+      <url>/2018/11/09/%E6%AD%A4%E5%A4%84%E6%97%A0%E5%A3%B0/</url>
+      
+        <content type="html"><![CDATA[<p><img src="http://img2.shangxueba.com/img/2cto_artImg/20140523/17/0011EDF203ED2A1841A3B5331C0E6F6E.png" alt="图1"><br>要求给出nsfocus的注册码。<br>因为涉及到MD5与RC6加密算法，所以比较烦人。<br>无壳，但有所保护，可以无视。<br>运行起来，bp MessageBoxA下断点回溯可以一点一点找到关键代码。<br>首先判断  </p><pre><code class="Assembly">00401882 |. 83F9 20 cmp ecx, 20 ; 判断长度32位00401885 |. 75 28 jnz short CrackMe2.004018AF00401887 |. 33C9 xor ecx, ecx00401889 |&gt; 8A0411 /mov al, byte ptr ds:[ecx+edx]0040188C |. 3C 30 |cmp al, 30 ; 与0比较0040188E |. 7C 04 |jl short CrackMe2.0040189400401890 |. 3C 39 |cmp al, 39 ; 与9比较00401892 |. 7E 08 |jle short CrackMe2.0040189C00401894 |&gt; 3C 41 |cmp al, 4100401896 |. 7C 0A |jl short CrackMe2.004018A2 ; 与A比较00401898 |. 3C 46 |cmp al, 460040189A |. 7F 06 |jg short CrackMe2.004018A2 ; 与F比较0040189C |&gt; 41 |inc ecx0040189D |. 83F9 20 |cmp ecx, 20004018A0 |.^ 7C E7 \jl short CrackMe2.00401889004018A2 |&gt; 83F9 20 cmp ecx, 20 ; 这里正常004018A5 |. 75 08 jnz short CrackMe2.004018AF004018A7 |. B8 01000000 mov eax, 1</code></pre><p>这里确定注册码为32位，且字符只可能为0-F。瞬间不淡定了，32位，很可能就出现MD5。而注册字符只可能是0-F。<br>接着分析,到最后比较之处.<br><img src="http://img2.shangxueba.com/img/2cto_artImg/20140523/17/5513D2034B195721D5A96381C979034E.png" alt="图2"><br>在数据窗口发现如下部分。  </p><pre><code class="Assembly">0012F664 35 47 82 5C 33 8C 85 77 9A 67 45 7A 6D 5C 16 47 5G俓3寘w歡Ezm\G0012F674 F6 AD DD 6C 46 EB B6 44 BD A2 65 36 6E 8C A6 75 霏輑F攵D舰e6n對u0012F684 B9 B7 DD 1C 42 1E 00 5B C9 A7 F7 0B 84 8E 3D 0E 狗?B.[骚?剮=</code></pre><p>其中<code>B9B7DD1C421E005BC9A7F70B848E3D0E</code>是nsfocus的MD5值。<br><code>F6ADDD6C46EBB644BDA265366E8CA675</code>是个人输入的注册码[这里为展示输入为正确注册码]。<br>而上面一串3547825C338C85779A67457A6D5C1647瞬间让我不淡定了。<br>也就是说，CrackMe判断方式为Eecode(Key)=MD5(Name)。<br>加密算法只用到0-F，且可能有自身的密钥串3547825C338C85779A67457A6D5C1647。猜想可能用到RC6加密算法。<br>因为有一种方式为RC6Decrypt(MD5(Name))=Key。也算是偶尔查到看雪的一个帖子。<br>这样用RC6解密试一下<br><img src="http://img2.shangxueba.com/img/2cto_artImg/20140523/17/DDBF5F3FABB28CF9AF66F7A272750D8E.png" alt="图3"><br>密钥串果然是3547825C338C85779A67457A6D5C1647<br>好吧，周折之下总算得到Key:nsfocus:F6ADDD6C46EBB644BDA265366E8CA675  </p><blockquote><p>转自实验吧，原文作者实验吧ID bigtree</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>该题不简单-----IDA算法分析</title>
+      <link href="/2018/11/09/%E8%AF%A5%E9%A2%98%E4%B8%8D%E7%AE%80%E5%8D%95-----IDA%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90/"/>
+      <url>/2018/11/09/%E8%AF%A5%E9%A2%98%E4%B8%8D%E7%AE%80%E5%8D%95-----IDA%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<p>其实此题并非很难的嘛，宝宝这就讲一下啦~<br>首先用IDA载入，审阅左侧函数名列表，看到第一个函数就是DialogFunc，顾名思义为“对话函数”，极有可能负责了交互界面的相关功能，我们双击它，看到右侧汇编区域中出现“密钥无效”（“密钥无效”存储在变量aZgb里）等敏感字符串，这正是出现在交互窗口中的信息，我们自然而然想到去分析返回“密钥无效”这一信息的逻辑判断的相关算法，我们F5看看DialogFunc的源码：<br><img src="http://gitbookfordt.test.upcdn.net/gaiti001.png" alt="图1"><br>发现这里有一个if判断（这里当然指的是内层那个啦),在<code>!sub_4011D0()</code>的值为false 即0时，就会弹出消息框，内容是<code>aZgb</code>即<code>密钥无效</code>，也就是说，当输入正确的注册码（即flag）时,<code>!sub_4011D0()</code>值就会是1，即<code>sub_4011D0()</code>的返回值为0，我们要做的就是分析一下怎么才能让<code>sub_4011D0()</code>返回0。<br>查看<code>sub_4011D0()</code>的源码：<br><img src="http://gitbookfordt.test.upcdn.net/gaiti002.png" alt="图2"><br>其中，有两个GetDlgItemTextA，第一个是读取用户名，第二个是读取注册码；我们现在来看返回值，是result，我们期望result的值是0，那么执行外层if时，条件应成立，实际上用户名是hello时已经能保证成立了，这个很明显，所以关键就是分析内层的逻辑，内层的那个if其实又是句没用的废话…这里真正关键的问题在于，让result的值是0，即：</p><p>lstrcmpA(&amp;String1, String) != 0的值是0，即lstrcmpA(&amp;String1, String)的值是0，即string1等于string，此处lstrcmp函数的功能大家自己查百度不难了解到，不懂的朋友自己去看一下很容易就看懂了。那么string1就是输入的注册码也就是我们的flag，也就是说正确的flag就是string，我们只要分析出string这一字符串到底是什么就OK了。注意，开始的时候string就是用户名hello，但是就在最后关头，一个字符串尾接函数lstrcatA已经将string改变了，所做的改变就是在原来的“hello”后面接上了字符串string2，于是，现在的任务又变成了确定string2的值，那么string2的值是怎么确定的呢？正是上面那段while循环的算法，我们下面给出这段的截图：<br><img src="http://gitbookfordt.test.upcdn.net/gaiti003.png" alt="图3"><br>算法对string的每个字符进行计算，结果赋给string2的对应字符，就把string2算出来了，我写出了对应的C语言代码：  </p><pre><code class="c">#include &lt;stdio.h&gt;int main(){  int a[5];  int r[5];  int i;  for(i=0;i&lt;=4;i++){      a[i]=getchar();      r[i]=0;  }  for(i=0;i&lt;=4;i++){      r[i]=(i+ i*a[i]*a[i]) % 66 + 33;  }  printf(&quot;\n&quot;);  for(i=0;i&lt;=4;i++){      printf(&quot;%c&quot;,r[i]);     }}</code></pre><p>运行程序输入“hello”，就会打印正确的string2：<br><img src="http://gitbookfordt.test.upcdn.net/gaiti004.png" alt="图4"><br>所以string的值就是“hello!GAOU”，即flag~~~  </p><blockquote><p>转自实验吧，原文作者实验吧ID Diyah Velly-Magpie</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实验吧Writeup </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 实验吧 </tag>
+            
+            <tag> 逆向WP </tag>
+            
+            <tag> writeup </tag>
+            
+        </tags>
+      
+    </entry>
+    
+  
+  
+</search>

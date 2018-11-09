@@ -79,20 +79,18 @@
 
 
 
-<meta name="description" content="题目给了个py打包的exe，提示py2exe这里安利一个工具pyinstaller extractor，可以将pyinstaller打包的pyexe还原回去提前出来的源码如下看到flag明文，贼激动，提交GG……跟一边buf过程，十六进制打出来和data特别像，猜测应该是根据加密算法，逆推解密，data已知，给出解密过程   data = &amp;quot;\x1c\x7a\x16\x77\x10\x2">
+<meta name="description" content="先用ida64打开tlc   buf = 0LL; v10 = 0; memset(&amp;amp;v8, 0, 0x400uLL); memset(&amp;amp;s, 0, 0x400uLL); printf(&amp;quot;Please input key: &amp;quot;, a2, &amp;amp;s); fflush(stdout); read(0, &amp;amp;buf, 0xCuLL); sub_401241(">
 <meta name="keywords" content="实验吧,逆向WP,writeup">
 <meta property="og:type" content="article">
-<meta property="og:title" content="NSCTF Reverse 400">
-<meta property="og:url" content="http://yoursite.com/2018/11/10/NSCTF-Reverse-400/index.html">
+<meta property="og:title" content="tlc">
+<meta property="og:url" content="http://yoursite.com/2018/11/10/tlc/index.html">
 <meta property="og:site_name" content="液氮腾">
-<meta property="og:description" content="题目给了个py打包的exe，提示py2exe这里安利一个工具pyinstaller extractor，可以将pyinstaller打包的pyexe还原回去提前出来的源码如下看到flag明文，贼激动，提交GG……跟一边buf过程，十六进制打出来和data特别像，猜测应该是根据加密算法，逆推解密，data已知，给出解密过程   data = &amp;quot;\x1c\x7a\x16\x77\x10\x2">
+<meta property="og:description" content="先用ida64打开tlc   buf = 0LL; v10 = 0; memset(&amp;amp;v8, 0, 0x400uLL); memset(&amp;amp;s, 0, 0x400uLL); printf(&amp;quot;Please input key: &amp;quot;, a2, &amp;amp;s); fflush(stdout); read(0, &amp;amp;buf, 0xCuLL); sub_401241(">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/py2exere.png">
-<meta property="og:updated_time" content="2018-11-09T17:24:25.205Z">
+<meta property="og:updated_time" content="2018-11-09T17:58:28.914Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NSCTF Reverse 400">
-<meta name="twitter:description" content="题目给了个py打包的exe，提示py2exe这里安利一个工具pyinstaller extractor，可以将pyinstaller打包的pyexe还原回去提前出来的源码如下看到flag明文，贼激动，提交GG……跟一边buf过程，十六进制打出来和data特别像，猜测应该是根据加密算法，逆推解密，data已知，给出解密过程   data = &amp;quot;\x1c\x7a\x16\x77\x10\x2">
-<meta name="twitter:image" content="http://gitbookfordt.test.upcdn.net/py2exere.png">
+<meta name="twitter:title" content="tlc">
+<meta name="twitter:description" content="先用ida64打开tlc   buf = 0LL; v10 = 0; memset(&amp;amp;v8, 0, 0x400uLL); memset(&amp;amp;s, 0, 0x400uLL); printf(&amp;quot;Please input key: &amp;quot;, a2, &amp;amp;s); fflush(stdout); read(0, &amp;amp;buf, 0xCuLL); sub_401241(">
 
 
 
@@ -122,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/11/10/NSCTF-Reverse-400/">
+  <link rel="canonical" href="http://yoursite.com/2018/11/10/tlc/">
 
 
 
 
 
-  <title>NSCTF Reverse 400 | 液氮腾</title>
+  <title>tlc | 液氮腾</title>
   
 
 
@@ -288,7 +286,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/10/NSCTF-Reverse-400/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/10/tlc/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="液氮腾">
@@ -305,7 +303,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">NSCTF Reverse 400</h1>
+          <h1 class="post-title" itemprop="name headline">tlc</h1>
         
 
         <div class="post-meta">
@@ -317,7 +315,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-10T00:40:00+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-10T01:53:06+08:00">
                 2018-11-10
               </time>
             
@@ -377,19 +375,47 @@
       
 
       
-        <p>题目给了个py打包的exe，提示py2exe<br>这里安利一个工具<code>pyinstaller extractor</code>，可以将<code>pyinstaller</code>打包的pyexe还原回去<br>提前出来的源码如下<br><img src="http://gitbookfordt.test.upcdn.net/py2exere.png" alt="图"><br>看到flag明文，贼激动，提交GG……<br>跟一边buf过程，十六进制打出来和data特别像，猜测应该是根据加密算法，逆推解密，data已知，给出解密过程  </p>
-<pre><code class="python">data = &quot;\x1c\x7a\x16\x77\x10\x2a\x51\x1f\x4c\x0f\x5b\x1d\x42\x2f\x4b\x7e\x4a\x7a\x4a\x7b&quot; +&quot;\x49\x7f\x4a\x7f\x1e\x78\x4c\x75\x10\x28\x18\x2b\x48\x7e\x46\x23\x12\x24\x11\x72&quot; +&quot;\x4b\x2e\x1b\x7e\x4f\x2b\x12\x76\x0b&quot;
-
-data = list(data)
-print len(data)
-
-for x in range(0, 48):
-  data[x] = chr(ord(data[x]) ^ ord(data[x+1]))
-
-
-data[48] = chr(ord(data[48]) ^ 0x0b)
-print &#39;&#39;.join(data)
+        <p>先用ida64打开tlc  </p>
+<pre><code class="c">buf = 0LL;
+v10 = 0;
+memset(&amp;v8, 0, 0x400uLL);
+memset(&amp;s, 0, 0x400uLL);
+printf(&quot;Please input key: &quot;, a2, &amp;s);
+fflush(stdout);
+read(0, &amp;buf, 0xCuLL);
+sub_401241((const char *)&amp;buf);
 </code></pre>
+<p>看到这个函数是对输入字符串进行rot13操作（核心语句：a1[v3] = (a1[v3] + 13) % (v4 + 26);）<br>sub_400EC7((<strong>int64)&amp;buf, (</strong>int64)&amp;s, 0xCuLL);<br>这个函数是进行base64解码操作（因为有base64的三段式位移  </p>
+<pre><code class="c">v3 = 4 * (unsigned __int64)sub_400AAD(*(_BYTE *)(a1 + i));
+*(_BYTE *)(a2 + v14) = v3 | ((signed int)(sub_400AAD(*(_BYTE *)(i + 1 + a1)) &amp; 0x30) &gt;&gt; 4);
+v4 = 16 * (unsigned __int64)sub_400AAD(*(_BYTE *)(i + 1 + a1));
+*(_BYTE *)(v14 + 1 + a2) = v4 | ((unsigned __int8)sub_400AAD(*(_BYTE *)(i + 2 + a1)) &gt;&gt; 2);
+v5 = (unsigned __int8)sub_400AAD(*(_BYTE *)(i + 2 + a1)) &lt;&lt; 6;
+*(_BYTE *)(v14 + 2 + a2) = v5 | (unsigned __int64)sub_400AAD(*(_BYTE *)(i + 3 + a1));
+）
+
+
+  v3 = strlen(&amp;s);
+  sub_4006B6((__int64)&amp;s, v3);
+</code></pre>
+<p>这里是一个判断函数，如果不满足条件则直接exit  </p>
+<pre><code class="c">v4 = 10 * v4 + *(_BYTE *)(i + a1) - 48;
+if ( v4 % (i + 1) )
+  exit(1);
+</code></pre>
+<p>从形式上看，输入很可能是数字，因为每个输入的ascii码与“0”的相减，然后按位检查是否能够整除  </p>
+<pre><code class="c">v11 = malloc(0x108uLL);
+v4 = strlen(&amp;s);
+sub_400877((__int64)v11, (__int64)&amp;s, v4);# 这里就是各种操作，只要能过判断函数，都能解得一个结果，就是看是否有意义而已
+v5 = strlen(::s);
+sub_400A1B((__int64)v11, (__int64)&amp;v8, (__int64)::s, v5);
+printf(&quot;Text is: %s\n&quot;, &amp;v8);
+return 0LL;
+</code></pre>
+<p>所以综上：首先输入然后rot13,然后base64解码,然后做了一个判断(高n位能被n整除),最后用输入作为密钥解密一段数据,得到flag。  </p>
+<blockquote>
+<p>转自实验吧，原文作者实验吧ID canic</p>
+</blockquote>
 
       
     </div>
@@ -424,8 +450,8 @@ print &#39;&#39;.join(data)
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/11/09/bin100-ebCTF-2013/" rel="next" title="bin100(ebCTF 2013)">
-                <i class="fa fa-chevron-left"></i> bin100(ebCTF 2013)
+              <a href="/2018/11/10/NSCTF-Reverse-500/" rel="next" title="NSCTF Reverse 500">
+                <i class="fa fa-chevron-left"></i> NSCTF Reverse 500
               </a>
             
           </div>
@@ -434,8 +460,8 @@ print &#39;&#39;.join(data)
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/11/10/NSCTF-Reverse-500/" rel="prev" title="NSCTF Reverse 500">
-                NSCTF Reverse 500 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/11/10/输出没有输出的内容/" rel="prev" title="输出没有输出的内容">
+                输出没有输出的内容 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
