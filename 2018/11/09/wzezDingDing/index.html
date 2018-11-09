@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="实验吧,逆向WP,writeup,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这个题目是一个64位的驱动，在ida里分析了一下。首先找到正常的驱动分发函数里，看看这个驱动都完成什么功能。下面是驱动分发函数中，比较iocontrol code的地方。然后进入每个处理分支，观察一下都做了什么。发现每个分支都有一个特点，满足相应的条件判断，就会将全局变量dword_148E0某位置为F。   比如： 88102004这个分支，当从ring3输入字符串为”^lejAJ]O”  “M">
+<meta name="keywords" content="实验吧,逆向WP,writeup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wzezDingDing">
+<meta property="og:url" content="http://yoursite.com/2018/11/09/wzezDingDing/index.html">
+<meta property="og:site_name" content="液氮腾">
+<meta property="og:description" content="这个题目是一个64位的驱动，在ida里分析了一下。首先找到正常的驱动分发函数里，看看这个驱动都完成什么功能。下面是驱动分发函数中，比较iocontrol code的地方。然后进入每个处理分支，观察一下都做了什么。发现每个分支都有一个特点，满足相应的条件判断，就会将全局变量dword_148E0某位置为F。   比如： 88102004这个分支，当从ring3输入字符串为”^lejAJ]O”  “M">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://img-blog.csdn.net/20141121132402953">
+<meta property="og:image" content="https://img-blog.csdn.net/20141121160856750">
+<meta property="og:image" content="https://img-blog.csdn.net/20141121160921549">
+<meta property="og:updated_time" content="2018-11-09T16:51:13.915Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="wzezDingDing">
+<meta name="twitter:description" content="这个题目是一个64位的驱动，在ida里分析了一下。首先找到正常的驱动分发函数里，看看这个驱动都完成什么功能。下面是驱动分发函数中，比较iocontrol code的地方。然后进入每个处理分支，观察一下都做了什么。发现每个分支都有一个特点，满足相应的条件判断，就会将全局变量dword_148E0某位置为F。   比如： 88102004这个分支，当从ring3输入字符串为”^lejAJ]O”  “M">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20141121132402953">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/09/wzezDingDing/">
+
+
+
+
+
+  <title>wzezDingDing | 液氮腾</title>
+  
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai-sublime.min.css">
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">液氮腾</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/09/wzezDingDing/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="液氮腾">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="液氮腾">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">wzezDingDing</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-09T22:58:23+08:00">
+                2018-11-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/实验吧Writeup/" itemprop="url" rel="index">
+                    <span itemprop="name">实验吧Writeup</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这个题目是一个64位的驱动，在ida里分析了一下。<br>首先找到正常的驱动分发函数里，看看这个驱动都完成什么功能。下面是驱动分发函数中，比较iocontrol code的地方。<br><img src="https://img-blog.csdn.net/20141121132402953" alt="图1"><br>然后进入每个处理分支，观察一下都做了什么。发现每个分支都有一个特点，满足相应的条件判断，就会将全局变量dword_148E0某位置为F。  </p>
+<p>比如： 88102004这个分支，当从ring3输入字符串为”^lejAJ]O”  “MNIII” 时，会分别置dword_148E0第六位 第五位为F，两次在ring3调用DeviceIoControlcode即可。<br>后面的分支每次按条件要求，依次在ring3调用DeviceIoControlcode， 让驱动走完每个iocontrol code的处理分支。<br>注意：8810200c的分支是判断ring3的映像文件名是否含有HCTF这几个字符。<br>流程还需要走一个其它分支，这里就选择了0x88102014，就是jmp loc12788，这个分支会给第一位置F<br>接着写个ring3的程序，跑一下看看什么情况  </p>
+<pre><code class="ring3">HANDLE hDev = CreateFile(&quot;\\\\.\\Hctf&quot;,GENERIC_READ |GENERIC_WRITE,FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,OPEN_EXISTING ,0, NULL);
+DWORD code=0;
+DWORD dwShellcodeSize=0x104;
+char InBuf[] = &quot;^lejAJ]O&quot;;
+char mniii[]=&quot;MNIII&quot;;
+char ret[]=&quot;\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3&quot;;
+char OutBuf[0x100]={0};
+DWORD dwRetBytes  = 0;
+char OutBuf2[0x100]={0};
+
+DeviceIoControl(hDev, 0x88102004,InBuf, 0x9, OutBuf, 0x100, &amp;dwRetBytes, 0);
+DeviceIoControl(hDev, 0x88102004,mniii, 0x6, OutBuf, 0x100, &amp;dwRetBytes, 0);
+DeviceIoControl(hDev, 0x88102008,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+DeviceIoControl(hDev, 0x88102014,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+DeviceIoControl(hDev, 0x88102010,ret, 16, OutBuf2, 0x100, &amp;dwRetBytes, 0);
+
+CloseHandle(hDev);
+
+</code></pre>
+<p>发现驱动直接crash在下面这个call里，调用到栈上的一个地址<br><img src="https://img-blog.csdn.net/20141121160856750" alt="图2"><br>到这就太想吐槽了，crash在这后，发现里面有一部分代码，还有类似循环的代码，还以为要怎么补成一个计算flag的算法，尼玛最后知道就是补成栈平衡就行，真是没做过ctf啊，太天真了。。<br>从ring3传进来的，然后在驱动里补齐。如下图所示这段代码<br><img src="https://img-blog.csdn.net/20141121160921549" alt="图3"><br>需要填补上<code>\x50\x41\x50\x48\x83\xec\x28\x59\xc3</code>使堆栈平衡<br>加上hctf{}格式就是flag了  </p>
+<blockquote>
+<p>转自CSDN博客，<a href="https://blog.csdn.net/trap0d/article/details/41346749" target="_blank" rel="noopener">原链接</a></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/实验吧/" rel="tag"># 实验吧</a>
+          
+            <a href="/tags/逆向WP/" rel="tag"># 逆向WP</a>
+          
+            <a href="/tags/writeup/" rel="tag"># writeup</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/09/这个FLAG有点怪/" rel="next" title="这个FLAG有点怪">
+                <i class="fa fa-chevron-left"></i> 这个FLAG有点怪
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/09/reversemeplz/" rel="prev" title="reversemeplz">
+                reversemeplz <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240" alt="液氮腾">
+            
+              <p class="site-author-name" itemprop="name">液氮腾</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">液氮腾</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

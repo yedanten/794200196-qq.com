@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="实验吧,逆向WP,writeup,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="APK文件丢apktool里，拆包，转jar，看源码注意这个func函数，我们要跟进去，但是func是加载so得到的IDA打开so文件，去找func，但是！！！没有！！！好的，我忍！dex加载so的时候，首先会导出函数中查找JNI_Onload函数，默认情况下，不需要我们管，但是可以重写JNI_Onload进行注册函数我们去找JNI_Onload函数点进去发现func字样，下面的函数是_cxa_b">
+<meta name="keywords" content="实验吧,逆向WP,writeup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="这个FLAG有点怪">
+<meta property="og:url" content="http://yoursite.com/2018/11/09/这个FLAG有点怪/index.html">
+<meta property="og:site_name" content="液氮腾">
+<meta property="og:description" content="APK文件丢apktool里，拆包，转jar，看源码注意这个func函数，我们要跟进去，但是func是加载so得到的IDA打开so文件，去找func，但是！！！没有！！！好的，我忍！dex加载so的时候，首先会导出函数中查找JNI_Onload函数，默认情况下，不需要我们管，但是可以重写JNI_Onload进行注册函数我们去找JNI_Onload函数点进去发现func字样，下面的函数是_cxa_b">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag001.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag002.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag003.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag004.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag005.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag006.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag007.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag008.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag009.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag010.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag011.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag012.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag013.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag014.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag015.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag017.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag016.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag018.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag019.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag020.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag021.png">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/zgflag022.png">
+<meta property="og:updated_time" content="2018-11-09T17:27:11.842Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="这个FLAG有点怪">
+<meta name="twitter:description" content="APK文件丢apktool里，拆包，转jar，看源码注意这个func函数，我们要跟进去，但是func是加载so得到的IDA打开so文件，去找func，但是！！！没有！！！好的，我忍！dex加载so的时候，首先会导出函数中查找JNI_Onload函数，默认情况下，不需要我们管，但是可以重写JNI_Onload进行注册函数我们去找JNI_Onload函数点进去发现func字样，下面的函数是_cxa_b">
+<meta name="twitter:image" content="http://gitbookfordt.test.upcdn.net/zgflag001.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/09/这个FLAG有点怪/">
+
+
+
+
+
+  <title>这个FLAG有点怪 | 液氮腾</title>
+  
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai-sublime.min.css">
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">液氮腾</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/09/这个FLAG有点怪/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="液氮腾">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="液氮腾">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">这个FLAG有点怪</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-09T19:08:00+08:00">
+                2018-11-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/实验吧Writeup/" itemprop="url" rel="index">
+                    <span itemprop="name">实验吧Writeup</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>APK文件丢apktool里，拆包，转jar，看源码<br><img src="http://gitbookfordt.test.upcdn.net/zgflag001.png" alt="图1"><br>注意这个func函数，我们要跟进去，但是func是加载so得到的<br>IDA打开so文件，去找func，但是！！！没有！！！<br>好的，我忍！<br>dex加载so的时候，首先会导出函数中查找JNI_Onload函数，默认情况下，不需要我们管，但是可以重写JNI_Onload进行注册函数<br>我们去找JNI_Onload函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag002.png" alt="图2"><br>点进去发现func字样，下面的函数是<code>_cxa_begin_match</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag003.png" alt="图3"><br>点击跟进F5<br>从上到下看，出现第一个奇怪的函数<code>gun_arm_fini_29</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag004.png" alt="图4"><br>点击跟进去，知道功能为读取字符串用的<br><img src="http://gitbookfordt.test.upcdn.net/zgflag005.png" alt="图5"><br>返回继续分析源码<br>中间有很多东西，是关于调用线程和检测程序的，总的来说就是一种简单的对抗gdb调试的思路吧！（猜的）<br><img src="http://gitbookfordt.test.upcdn.net/zgflag006.png" alt="图6"><br>然后继续看，我们刚刚输入的字符串进行了一个抑或加密，加密是以如下方式text[i]=text[i]^(i+1)进行的<br><img src="http://gitbookfordt.test.upcdn.net/zgflag007.png" alt="图7"><br>然后我们继续看如下语句<br><img src="http://gitbookfordt.test.upcdn.net/zgflag008.png" alt="图8"><br>这几个变量m_y，tempSt，tempabc貌似都没有定义啊！去init段找找吧<br>查看init段，发现函数<code>_cxa_chk_fail</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag009.png" alt="图9"><br>跟进去看<br>关键代码在这，跟进<code>sub_1A74</code>函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag010.png" alt="图10"><br>这些变量类似于全局变量在这里被注册，在这里对m_y和tempabc进行了初始定义<br>m_y的值为6<br>tempabc的值为syc<br>tempabc赋值进过了一次<code>gun_Unwind1</code>函数，跟进去代码很简单，就是逐位转ascii后-2，在转回字符返回，偷个懒不截图了  </p>
+<p>然后回到_cxa_begin_match继续跟踪逻辑，这里调用了一个<code>imp_Unwind_k</code>函数<br>进去查看<br><img src="http://gitbookfordt.test.upcdn.net/zgflag011.png" alt="图11"><br>可以看到是把穿进去的字符串右移6位，赋值给tempStr<br>至此，刚刚上面3个未定义的变量值就都确定了<br>回<code>_cxa_begin_match</code>函数，看下一句<code>gun_armfini_33</code>函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag012.png" alt="图12"><br>关键代码<br><img src="http://gitbookfordt.test.upcdn.net/zgflag013.png" alt="图13"><br>大概作用就是，把<code>tempabc</code>中的大写字母转小写，<code>tempStr</code>字符串则是移位2位，赋值给v15……【逻辑看的头疼】<br>然后下面返回<code>imp_Unwind_j</code>函数，继续跟进去看<br><img src="http://gitbookfordt.test.upcdn.net/zgflag014.png" alt="图14"><br>分析,第一个if段，确定tempStr角标0 1 2 3 9 10的值，分析过程<br>角标1和2的值相同，为111，转字符为<code>o</code><br>其他的根据判断条件，设角标9为x，可得方程<code>(2*(x-1)-29)+(2*(x-1))+x+(x+31)-304==0</code>，解方程x=51，python有个库为sympy，快速解方程  </p>
+<pre><code class="python">from sympy import *
+x=Symbol(&#39;x&#39;)
+print(solve((2*(x-1)-29)+(2*(x-1))+x+(x+31)-304, x))
+
+</code></pre>
+<p>至此tempStr的值如下</p>
+<pre><code class="string">tempStr[0] = &#39;G&#39;
+tempStr[1] = &#39;o&#39;
+tempStr[2] = &#39;o&#39;
+tempStr[3] = &#39;d&#39;
+tempStr[4] = &#39;&#39;
+tempStr[5] = &#39;&#39;
+tempStr[6] = &#39;&#39;
+tempStr[7] = &#39;&#39;
+tempStr[8] = &#39;&#39;
+tempStr[9] = &#39;3&#39;
+tempStr[10] = &#39;R&#39;
+</code></pre>
+<p>继续看第二个if条件，循环5次，分别计算出角标4~8的值，角标值异或0x11在加循环次数【次数从0开始算】要等于V6，V6的值根据&amp;szCmp得到，每次循环该地址加4<br>szCmp的值双击跟进去直接看到分别为 <code>R d r u ^</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag015.png" alt="图15"><br>最终得到tempStr的值为<code>GoodCracK3R</code>  </p>
+<p>回到<code>_cxa_begin_match</code>函数继续分析<br>看接下来的if段，注意这里的<code>desc</code>和<code>src</code><br><img src="http://gitbookfordt.test.upcdn.net/zgflag017.png" alt="图17"><br>去看变量定义<br><img src="http://gitbookfordt.test.upcdn.net/zgflag016.png" alt="图16"><br>字符串s其实就是我们要找的，目前已经能确定出前11位<code>GoodCracK3R</code>，src是角标8的首地址，v21和s相差11，作为结束位置<br>11位之后的值将赋值给<code>dest</code><br>并且这里我们给seed赋值，他的位置正好是加密后串（s串的第9、10、11位，也就是K3R）这个seed后面有用！之后进入gun_armfini_21函数，首先是进入<code>gun_armfini_23</code>函数，这里利用了seed值对v8生成了一个256长度的int数组！<br><img src="http://gitbookfordt.test.upcdn.net/zgflag018.png" alt="图18"><br>用python还原一下逻辑</p>
+<pre><code class="python">def make(str,lens):
+    a=[]
+    for i in range(256):
+        a.append(i)
+    pos=0
+    pos_temp=0
+    for i in range(256):
+        temp = a[i]
+        pos_temp=(ord(str[pos])+a[i]+pos_temp)&amp;0xff
+        a[i]=a[pos_temp]
+        a[pos_temp]=temp
+        pos=((pos+1)%lens)&amp;0xff
+    return a
+</code></pre>
+<p>然后我们这个v8数组后面还会用到。之后进入gun_armfini_36函数，这个函数主要就是对11位之后的字符串进行了处理<br><img src="http://gitbookfordt.test.upcdn.net/zgflag019.png" alt="图19">  </p>
+<p>然后我们还是回到<code>_cxa_begin_match</code>函数！接近结束了！<br>我们看到是用sprintf函数对v18进行赋值（用11位以后，加密过的字符）然后进入<code>gun_arm_ldiv0</code>函数去匹配！<br><img src="http://gitbookfordt.test.upcdn.net/zgflag020.png" alt="图20"><br>调用了<code>gun_Unwind</code>函数<br><img src="http://gitbookfordt.test.upcdn.net/zgflag021.png" alt="图21"><br>继续跟进去<br><img src="http://gitbookfordt.test.upcdn.net/zgflag022.png" alt="图22"><br>功能就是把字符串转ascii逐位-2<br>最后我们看看它在做什么？11位之后的内容，进过加密，以16进制形式输出</p>
+<pre><code class="string">0xa8
+0xe5
+0x58
+0x8f
+0x7e
+0x03
+0xf7
+0x58
+</code></pre>
+<p>然后根据上面的分析，我们就可以得到gun_armfini_33加密以后后八位的字符串是啥了！  </p>
+<pre><code class="python">def test():
+    a=make(&#39;K3R&#39;,3)
+    value=[0xa8,0xe5,0x58,0x8f,0x7e,0x03,0xf7,0x58]
+    temp1=0
+    temp2=0
+    temp3=0
+    flag=&#39;&#39;
+    print a
+    for i in value:
+        temp1=(temp1+1)&amp;0xff
+        temp2=a[temp1]
+        temp3=(temp3+temp2)&amp;0xff
+        a[temp1]=a[temp3]
+        a[temp3]=temp2
+        flag+=chr(i^a[(a[temp1]+temp2)&amp;0xff])
+    print flag
+</code></pre>
+<p>得到<code>GoodCracK3R;{0jN|B6</code><br>接下来只需要逆向一下gun_armfini_33函数，再移位回去再抑或一下就得到答案了！解密程序如下  </p>
+<pre><code class="python">ppp=&quot;GoodCracK3R;{0jN|B6&quot;
+key = &#39;syc&#39;
+flag=[]
+for i in ppp:
+    flag.append(ord(i))
+print flag
+for j in range(len(flag)):
+    if flag[j]&gt;=ord(&#39;a&#39;) and flag[j]&lt;=ord(&#39;z&#39;):
+        flag[j]=(flag[j]-97+26-ord(key[j%3])+97)%26+97
+    elif flag[j]&gt;=ord(&#39;A&#39;) and flag[j]&lt;=ord(&#39;Z&#39;):
+        flag[j]=(flag[j]-65+26-ord(key[j%3])+97)%26+65
+
+newflag=&#39;&#39;
+for i in range(6,6+len(flag)):
+    newflag+=chr(flag[i%len(flag)]^(i-5))
+print newflag
+</code></pre>
+<p>得到FLAG <code>xctf{hgJ7Q=|8a\wV;A~}}Wc}</code></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/实验吧/" rel="tag"># 实验吧</a>
+          
+            <a href="/tags/逆向WP/" rel="tag"># 逆向WP</a>
+          
+            <a href="/tags/writeup/" rel="tag"># writeup</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/09/有一个程序加密得如下/" rel="next" title="有一个程序加密得如下">
+                <i class="fa fa-chevron-left"></i> 有一个程序加密得如下
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/09/wzezDingDing/" rel="prev" title="wzezDingDing">
+                wzezDingDing <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240" alt="液氮腾">
+            
+              <p class="site-author-name" itemprop="name">液氮腾</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">液氮腾</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

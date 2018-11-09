@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="实验吧,逆向WP,writeup,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="题目只给了一串类似乱码的字符串0be6770IigHXZpz9hQYR1fpl15R0z9MUalmYEPhJeEN/sRklL6wQw5yQ7SAyT6tKGJNY0AxnyzS/L7zWQII=程序是.pyc利用工具将pyc转成py工具名EasyPythonDecompiler得到如下代码 # Embedded file name: ./rev200.py import sys from ha">
+<meta name="keywords" content="实验吧,逆向WP,writeup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="有一个程序加密得如下">
+<meta property="og:url" content="http://yoursite.com/2018/11/09/有一个程序加密得如下/index.html">
+<meta property="og:site_name" content="液氮腾">
+<meta property="og:description" content="题目只给了一串类似乱码的字符串0be6770IigHXZpz9hQYR1fpl15R0z9MUalmYEPhJeEN/sRklL6wQw5yQ7SAyT6tKGJNY0AxnyzS/L7zWQII=程序是.pyc利用工具将pyc转成py工具名EasyPythonDecompiler得到如下代码 # Embedded file name: ./rev200.py import sys from ha">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://gitbookfordt.test.upcdn.net/pycrev300.png">
+<meta property="og:updated_time" content="2018-11-09T17:25:56.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="有一个程序加密得如下">
+<meta name="twitter:description" content="题目只给了一串类似乱码的字符串0be6770IigHXZpz9hQYR1fpl15R0z9MUalmYEPhJeEN/sRklL6wQw5yQ7SAyT6tKGJNY0AxnyzS/L7zWQII=程序是.pyc利用工具将pyc转成py工具名EasyPythonDecompiler得到如下代码 # Embedded file name: ./rev200.py import sys from ha">
+<meta name="twitter:image" content="http://gitbookfordt.test.upcdn.net/pycrev300.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/09/有一个程序加密得如下/">
+
+
+
+
+
+  <title>有一个程序加密得如下 | 液氮腾</title>
+  
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai-sublime.min.css">
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">液氮腾</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/09/有一个程序加密得如下/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="液氮腾">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="液氮腾">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">有一个程序加密得如下</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-09T17:30:55+08:00">
+                2018-11-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/实验吧Writeup/" itemprop="url" rel="index">
+                    <span itemprop="name">实验吧Writeup</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>题目只给了一串类似乱码的字符串<br><code>0be6770IigHXZpz9hQYR1fpl15R0z9MUalmYEPhJeEN/sRklL6wQw5yQ7SAyT6tKGJNY0AxnyzS/L7zWQII=</code><br>程序是.pyc<br>利用工具将pyc转成py<br>工具名EasyPythonDecompiler<br><img src="http://gitbookfordt.test.upcdn.net/pycrev300.png" alt="图1"><br>得到如下代码</p>
+<pre><code class="python"># Embedded file name: ./rev200.py
+import sys
+from hashlib import md5
+import base64
+from time import time
+from datetime import datetime
+UC_KEY = &#39;123456789&#39;
+
+def authcode(string, operation = &#39;DECODE&#39;, key = UC_KEY, expiry = 0):
+    ckey_length = 4
+    if key == &#39;&#39;:
+        key = md5(UC_KEY.encode(&#39;utf-8&#39;)).hexdigest()
+    else:
+        key = md5(key.encode(&#39;utf-8&#39;)).hexdigest()
+    keya = md5(key[0:16].encode(&#39;utf-8&#39;)).hexdigest()
+    keyb = md5(key[16:32].encode(&#39;utf-8&#39;)).hexdigest()
+    if ckey_length == 0:
+        keyc = &#39;&#39;
+    elif operation == &#39;DECODE&#39;:
+        keyc = string[0:ckey_length]
+    elif operation == &#39;ENCODE&#39;:
+        keyc = md5(str(datetime.now().microsecond).encode(&#39;utf-8&#39;)).hexdigest()[-ckey_length:]
+    else:
+        return
+    cryptkey = keya + md5((keya + keyc).encode(&#39;utf-8&#39;)).hexdigest()
+    key_length = len(cryptkey)
+    if operation == &#39;DECODE&#39;:
+        string = base64.b64decode(string[ckey_length:])
+    elif operation == &#39;ENCODE&#39;:
+        if expiry == 0:
+            string = &#39;0000000000&#39; + md5((string + keyb).encode(&#39;utf-8&#39;)).hexdigest()[0:16] + string
+        else:
+            string = &#39;%10d&#39; % (expiry + int(time())) + md5((string + keyb).encode(&#39;utf-8&#39;)).hexdigest()[0:16] + string
+    else:
+        return
+    string_length = len(string)
+    result = &#39;&#39;
+    box = range(256)
+    rndkey = [0] * 256
+    for i in range(256):
+        rndkey[i] = ord(cryptkey[i % key_length])
+
+    j = 0
+    for i in range(256):
+        j = (j + box[i] + rndkey[i]) % 256
+        tmp = box[i]
+        box[i] = box[j]
+        box[j] = tmp
+
+    a = j = 0
+    for i in range(string_length):
+        a = (a + 1) % 256
+        j = (j + box[a]) % 256
+        tmp = box[a]
+        box[a] = box[j]
+        box[j] = tmp
+        result += chr(ord(string[i]) ^ box[(box[a] + box[j]) % 256])
+
+    if operation == &#39;DECODE&#39;:
+        if not result[0:10].isdigit() or int(result[0:10]) == 0 or int(result[0:10]) - int(time()) &gt; 0:
+            if result[10:26] == md5(result[26:].encode(&#39;utf-8&#39;) + keyb).hexdigest()[0:16]:
+                return result[26:]
+            else:
+                return &#39;&#39;
+        else:
+            return &#39;&#39;
+    else:
+        return keyc + base64.b64encode(result)
+
+
+if __name__ == &#39;__main__&#39;:
+    if len(sys.argv) &lt; 3:
+        exit(1)
+    ex = 20
+    for i in range(1, len(sys.argv), 2):
+        a = sys.argv[i]
+        b = sys.argv[i + 1]
+        if a == &#39;-t&#39;:
+            ex = int(b)
+        elif a == &#39;-e&#39;:
+            encoded = authcode(b, &#39;ENCODE&#39;, expiry=ex)
+            print encoded
+        elif a == &#39;-d&#39;:
+            decoded = authcode(b, &#39;DECODE&#39;, expiry=ex)
+            print decoded
+</code></pre>
+<p>分析源码，执行的时候加入-d参数，值为题目给的乱码，但是返回的却是空<br>注意该段  </p>
+<pre><code class="python">if operation == &#39;DECODE&#39;:
+        if not result[0:10].isdigit() or int(result[0:10]) == 0 or int(result[0:10]) - int(time()) &gt; 0:
+            if result[10:26] == md5(result[26:].encode(&#39;utf-8&#39;) + keyb).hexdigest()[0:16]:
+                return result[26:]
+            else:
+                return &#39;&#39;
+        else:
+            return &#39;&#39;
+    else:
+        return keyc + base64.b64encode(result)
+</code></pre>
+<p>我们直接修改源码，跳过判断，在if之前直接print string，执行可得到  </p>
+<pre><code class="string">1429861566556d9f4f29671810DUTCTF{2u0_chu_14i_d3_5hi_h3n74i}
+</code></pre>
+<p>得到flag值<code>DUTCTF{2u0_chu_14i_d3_5hi_h3n74i}</code></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/实验吧/" rel="tag"># 实验吧</a>
+          
+            <a href="/tags/逆向WP/" rel="tag"># 逆向WP</a>
+          
+            <a href="/tags/writeup/" rel="tag"># writeup</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/09/证明自己吧/" rel="next" title="证明自己吧">
+                <i class="fa fa-chevron-left"></i> 证明自己吧
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/09/这个FLAG有点怪/" rel="prev" title="这个FLAG有点怪">
+                这个FLAG有点怪 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240" alt="液氮腾">
+            
+              <p class="site-author-name" itemprop="name">液氮腾</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">液氮腾</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
