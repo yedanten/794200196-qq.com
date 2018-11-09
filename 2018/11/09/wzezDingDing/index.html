@@ -349,25 +349,25 @@
       
         <p>这个题目是一个64位的驱动，在ida里分析了一下。<br>首先找到正常的驱动分发函数里，看看这个驱动都完成什么功能。下面是驱动分发函数中，比较iocontrol code的地方。<br><img src="https://img-blog.csdn.net/20141121132402953" alt="图1"><br>然后进入每个处理分支，观察一下都做了什么。发现每个分支都有一个特点，满足相应的条件判断，就会将全局变量dword_148E0某位置为F。  </p>
 <p>比如： 88102004这个分支，当从ring3输入字符串为”^lejAJ]O”  “MNIII” 时，会分别置dword_148E0第六位 第五位为F，两次在ring3调用DeviceIoControlcode即可。<br>后面的分支每次按条件要求，依次在ring3调用DeviceIoControlcode， 让驱动走完每个iocontrol code的处理分支。<br>注意：8810200c的分支是判断ring3的映像文件名是否含有HCTF这几个字符。<br>流程还需要走一个其它分支，这里就选择了0x88102014，就是jmp loc12788，这个分支会给第一位置F<br>接着写个ring3的程序，跑一下看看什么情况  </p>
-<pre><code class="ring3">HANDLE hDev = CreateFile(&quot;\\\\.\\Hctf&quot;,GENERIC_READ |GENERIC_WRITE,FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,OPEN_EXISTING ,0, NULL);
-DWORD code=0;
-DWORD dwShellcodeSize=0x104;
-char InBuf[] = &quot;^lejAJ]O&quot;;
-char mniii[]=&quot;MNIII&quot;;
-char ret[]=&quot;\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3&quot;;
-char OutBuf[0x100]={0};
-DWORD dwRetBytes  = 0;
-char OutBuf2[0x100]={0};
+<pre><code class="ring3">  HANDLE hDev = CreateFile(&quot;\\\\.\\Hctf&quot;,GENERIC_READ |GENERIC_WRITE,FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,OPEN_EXISTING ,0, NULL);
+  DWORD code=0;
+  DWORD dwShellcodeSize=0x104;
+  char InBuf[] = &quot;^lejAJ]O&quot;;
+  char mniii[]=&quot;MNIII&quot;;
+  char ret[]=&quot;\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3\xc3&quot;;
+  char OutBuf[0x100]={0};
+  DWORD dwRetBytes  = 0;
+  char OutBuf2[0x100]={0};
 
-DeviceIoControl(hDev, 0x88102004,InBuf, 0x9, OutBuf, 0x100, &amp;dwRetBytes, 0);
-DeviceIoControl(hDev, 0x88102004,mniii, 0x6, OutBuf, 0x100, &amp;dwRetBytes, 0);
-DeviceIoControl(hDev, 0x88102008,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
-DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
-DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
-DeviceIoControl(hDev, 0x88102014,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
-DeviceIoControl(hDev, 0x88102010,ret, 16, OutBuf2, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x88102004,InBuf, 0x9, OutBuf, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x88102004,mniii, 0x6, OutBuf, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x88102008,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x8810200c,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x88102014,ret, 16, OutBuf, 0x100, &amp;dwRetBytes, 0);
+  DeviceIoControl(hDev, 0x88102010,ret, 16, OutBuf2, 0x100, &amp;dwRetBytes, 0);
 
-CloseHandle(hDev);
+  CloseHandle(hDev);
 
 </code></pre>
 <p>发现驱动直接crash在下面这个call里，调用到栈上的一个地址<br><img src="https://img-blog.csdn.net/20141121160856750" alt="图2"><br>到这就太想吐槽了，crash在这后，发现里面有一部分代码，还有类似循环的代码，还以为要怎么补成一个计算flag的算法，尼玛最后知道就是补成栈平衡就行，真是没做过ctf啊，太天真了。。<br>从ring3传进来的，然后在驱动里补齐。如下图所示这段代码<br><img src="https://img-blog.csdn.net/20141121160921549" alt="图3"><br>需要填补上<code>\x50\x41\x50\x48\x83\xec\x28\x59\xc3</code>使堆栈平衡<br>加上hctf{}格式就是flag了  </p>
