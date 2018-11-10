@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="实验吧,逆向WP,writeup,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="In this challenge we are given an obfuscation plugin for llvm and an obfuscated binary. The plugin accepts a 16-byte seed as a parameter and uses it for internal PRNG. Our goal is to analyze the binar">
+<meta name="keywords" content="实验吧,逆向WP,writeup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zer0llvm">
+<meta property="og:url" content="http://yoursite.com/2018/11/10/zer0llvm/index.html">
+<meta property="og:site_name" content="液氮腾">
+<meta property="og:description" content="In this challenge we are given an obfuscation plugin for llvm and an obfuscated binary. The plugin accepts a 16-byte seed as a parameter and uses it for internal PRNG. Our goal is to analyze the binar">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-11-10T05:25:09.715Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="zer0llvm">
+<meta name="twitter:description" content="In this challenge we are given an obfuscation plugin for llvm and an obfuscated binary. The plugin accepts a 16-byte seed as a parameter and uses it for internal PRNG. Our goal is to analyze the binar">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/10/zer0llvm/">
+
+
+
+
+
+  <title>zer0llvm | 液氮腾</title>
+  
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai-sublime.min.css">
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">液氮腾</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/10/zer0llvm/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="液氮腾">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="液氮腾">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">zer0llvm</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-10T13:12:19+08:00">
+                2018-11-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/实验吧Writeup/" itemprop="url" rel="index">
+                    <span itemprop="name">实验吧Writeup</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>In this challenge we are given an obfuscation plugin for llvm and an obfuscated binary. The plugin accepts a 16-byte seed as a parameter and uses it for internal PRNG. Our goal is to analyze the binary and recover the seed from it.  </p>
+<p>The binary is basically a big state machine. Here is start of the main function:  </p>
+<pre><code class="Assembly">.text:4004C0 main:           ; DATA XREF: _start+1D
+.text:4004C0     push rbp
+.text:4004C1     mov  rbp, rsp
+.text:4004C4     sub  rsp, 4038Ch
+.text:4004CB     mov  dword ptr [rbp-4], 0
+.text:4004D2     mov  dword ptr [rbp-8], 46544330h
+.text:4004D9     mov  dword ptr [rbp-0Ch], 4E52BCE7h
+.text:4004E0
+.text:4004E0 main_switch:       ; CODE XREF: .text:loc_7635AC
+.text:4004E0     mov  eax, [rbp-0Ch]
+.text:4004E3     mov  ecx, eax
+.text:4004E5     sub  ecx, 8000DEEAh
+.text:4004EB     mov  [rbp-10h], eax
+.text:4004EE     mov  [rbp-14h], ecx
+.text:4004F1     jz   loc_728049
+.text:4004F7     jmp  $+5
+.text:4004FC
+.text:4004FC loc_4004FC:        ; CODE XREF: .text:00000000004004F7
+.text:4004FC     mov  eax, [rbp-10h]
+.text:4004FF     sub  eax, 8001EACAh
+.text:400504     mov  [rbp-18h], eax
+.text:400507     jz   loc_73E38A
+.text:40050D     jmp  $+5
+.text:400512
+.text:400512 loc_400512:        ; CODE XREF: .text:000000000040050D
+.text:400512     mov  eax, [rbp-10h]
+.text:400515     sub  eax, 8003CC64h
+.text:40051A     mov  [rbp-1Ch], eax
+.text:40051D     jz   loc_5C0C95
+.text:400523     jmp  $+5
+</code></pre>
+<p>In pseudocode, it could be something like this:  </p>
+<pre><code class="cpp">state = 0x4E52BCE7
+main_switch:
+switch(state) {
+    case 0x8000DEEA: goto loc_728049;
+    case 0x8001EACA: goto loc_73E38A;
+    case 0x8003CC64: goto loc_5C0C95;
+    ...
+}
+loc_xxxxxx:
+   // do something
+   state = 0x8003CC64
+   goto main_switch
+</code></pre>
+<p>Note that the state ids are sorted as signed 32-bit integers. Also, during the case probing, some intermediate data is written to the stack (i.e. <code>[rbp-14h]</code> and lower), but there are no further reads from that area. By running the binary and checking for system calls with strace we can see that it does not do anything useful. Let’s look at the llvm plugin to see how the seed is used.  </p>
+<blockquote>
+<p>lib0opsPass.so  </p>
+</blockquote>
+<p>The plugin is written in C++ and exports a bunch of functions. The main function of our interest is <code>Oops::OopsFlattening::flatten()</code>. Though it’s quite big, we can quickly locate interesting parts by looking at cross-references from crypto-related functions.  </p>
+<p>First it calls prng_seed to seed its internal PRNG state:  </p>
+<pre><code class="cpp">Oops::CryptoUtils::prng_seed(cryptoutils, &amp;seed_string);
+</code></pre>
+<p>Then it uses the PRNG to generate 16 bytes:  </p>
+<pre><code class="cpp">memset(&amp;key, 0, 0x20uLL);
+LODWORD(cryptoutils_) = llvm::ManagedStatic&lt;Oops::CryptoUtils&gt;::operator-&gt;(&amp;Oops::Oopscryptoutils, 0LL);
+Oops::CryptoUtils::get_bytes(cryptoutils_, &amp;key, 16);
+if ( crc32(&#39;FTC0&#39;, &amp;key, 3) != 0xF9E319A6 )
+...
+</code></pre>
+<p>Note that the hardcoded crc32 check allows us to easily find the first 3 bytes of the generated key: 179, 197, 140.  </p>
+<p>The key is then used to “scramble” values from a hardcoded array called plains:  </p>
+<pre><code class="cpp">LODWORD(plains0) = plains[0];
+LODWORD(v35) = llvm::ManagedStatic&lt;Oops::CryptoUtils&gt;::operator-&gt;(&amp;Oops::Oopscryptoutils, v33);
+v36 = plains0;
+v37 = Oops::CryptoUtils::scramble32(v35, plains0, &amp;key);
+...
+v60 = counter++;
+plainsCUR = plains[v60];
+LODWORD(v62) = llvm::ManagedStatic&lt;Oops::CryptoUtils&gt;::operator-&gt;(&amp;Oops::Oopscryptoutils, v59);
+v63 = Oops::CryptoUtils::scramble32(v62, plainsCUR, &amp;key);
+</code></pre>
+<p>It’s not clear for now how these “scrambled” values are used later. IDA tells us that there are around 216 values in the array:  </p>
+<pre><code class="Assembly">.data:2345E0 ; _DWORD plains[65806]
+.data:2345E0 plains          dd 0F6172961h, 0CB973739h, 904F3728h, 0DB7194B9h, 81E0B166h
+...
+</code></pre>
+<p>Probably it is possible to look at the LLVM-related code and see how exactly these values are used. But in the obfuscated binary there are not so many random-looking words. The only ones which come to mind are the state ids!  </p>
+<p>Let’s log all the state ids passed to the main_switch. Here is a simple gdb script for it:  </p>
+<pre><code class="bash">$ cat &gt;cmd
+set confirm off
+set pagination off
+break *0x04004e3
+commands
+p/x $eax
+cont
+end
+run
+
+$ gdb -x cmd -n ./0llvm &lt;/dev/null &gt;log
+$ head -30 log
+GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.04) 7.11.1
+...
+Reading symbols from ./0llvm...(no debugging symbols found)...done.
+Breakpoint 1 at 0x4004e3
+
+Breakpoint 1, 0x00000000004004e3 in main ()
+$1 = 0x4e52bce7
+
+Breakpoint 1, 0x00000000004004e3 in main ()
+$2 = 0x3ac545da
+
+Breakpoint 1, 0x00000000004004e3 in main ()
+$3 = 0xff97c58e
+
+Breakpoint 1, 0x00000000004004e3 in main ()
+$4 = 0xe83342dd
+
+$ tail log
+Breakpoint 1, 0x00000000004004e3 in main ()
+$65789 = 0xf1dbf041
+
+Breakpoint 1, 0x00000000004004e3 in main ()
+$65790 = 0xdb9a21b8
+
+Breakpoint 1, 0x00000000004004e3 in main ()
+$65791 = 0xb02b5689
+[Inferior 1 (process 10622) exited with code 027]
+(gdb) quit
+</code></pre>
+<p>65791 values! Quite close to 65801 found in IDA. The hypothesis seems to be true. But what does it give us now?  </p>
+<p>Recovering key  </p>
+<p>What we have found is that we have  216  </p>
+<p>pairs of plaintext/ciphertext under the “scramble32” function. Let’s look at it closer:  </p>
+<pre><code class="cpp">__int64 __fastcall Oops::CryptoUtils::scramble32(
+    Oops::CryptoUtils *this, unsigned int x, const char *key)
+{
+  int v3; // ST20_4@1
+  int v4; // ST24_4@1
+  int v5; // ST20_4@1
+
+  v3 = AES_PRECOMP_TE3[(x ^ key[3])] ^
+       AES_PRECOMP_TE2[(BYTE1(x) ^ key[2])] ^
+       AES_PRECOMP_TE1[((x &gt;&gt; 16) ^ key[1])] ^
+       AES_PRECOMP_TE0[(BYTE3(x) ^ *key)];
+  v4 = AES_PRECOMP_TE3[(v3 ^ key[7])] ^
+       AES_PRECOMP_TE2[(BYTE1(v3) ^ key[6])] ^
+       AES_PRECOMP_TE1[((v3 &gt;&gt; 16) ^ key[5])] ^
+       AES_PRECOMP_TE0[(BYTE3(v3) ^ key[4])];
+  v5 = AES_PRECOMP_TE3[(v4 ^ key[11])] ^
+       AES_PRECOMP_TE2[(BYTE1(v4) ^ key[10])] ^
+       AES_PRECOMP_TE1[((v4 &gt;&gt; 16) ^ key[9])] ^
+       AES_PRECOMP_TE0[(BYTE3(v4) ^ key[8])];
+  return AES_PRECOMP_TE3[(v5 ^ key[15])] ^
+         AES_PRECOMP_TE2[(BYTE1(v5) ^ key[14])] ^
+         AES_PRECOMP_TE1[((v5 &gt;&gt; 16) ^ key[13])] ^
+         AES_PRECOMP_TE0[(BYTE3(v5) ^ key[12])] ^
+         ((key[2] &lt;&lt; 8) | (key[1] &lt;&lt; 16) | (*key &lt;&lt; 24) | key[3]);
+}
+</code></pre>
+<p>Interesting, it is related to the <code>AES</code> block cipher. The <code>AES_PRECOMP_TE</code> tables map 8-bit values to 32-bit values. Possibly these tables implement MixColumns, or even together with SBoxes and xors. Let’s compose them with inverse of MixColumns (<a href="https://github.com/leetchicken/belluminar/blob/master/ahyes/solution/aes.py" target="_blank" rel="noopener">aes.py</a>):  </p>
+<pre><code class="python">from aes import AES
+A = AES()
+
+for i in xrange(4):
+    for x, t in enumerate(AES_PRECOMP_TE[i]):
+        t = [BYTE3(t), BYTE2(t), BYTE1(t), BYTE0(t)]
+        t2 = A.mixColumn(list(t), isInv=True)
+        print t2
+    print
+</code></pre>
+<pre><code class="bash">$ python precomp.py
+[99, 0, 0, 0]
+[124, 0, 0, 0]
+[119, 0, 0, 0]
+[123, 0, 0, 0]
+[242, 0, 0, 0]
+[107, 0, 0, 0]
+...
+</code></pre>
+<p>This is the AES SBox applied to one of the bytes! It means that  </p>
+<blockquote>
+<p>AES_PRECOMP_TE<a href="x">i</a> = MixColumns(SBox(x) &lt;&lt; 8*i).  </p>
+</blockquote>
+<p>Therefore <code>scramble32</code> is a 4-round iteration of <code>XorKey</code>, <code>SubBytes</code>, <code>MixColumn</code> followed by another <code>XorKey</code>. How do we recover the key?  </p>
+<p>Recall that we know <code>key[0]</code>, <code>key[1]</code>, <code>key[2]</code> from a CRC32 check. We can guess one-byte <code>key[3]</code> and bypass the first round easily. Luckily, the last whitening key is the same as the first one: with the same guess we can decrypt the last round aswell! By moving the keys through the linear layers and decrypring the linear layers, we arrive at two rounds:  </p>
+<blockquote>
+<p>XK | SB | MC | XK | SB | XK.  </p>
+</blockquote>
+<p>Let’s use <a href="http://eprint.iacr.org/2016/160" target="_blank" rel="noopener">impossible polytopes</a>. Assume that we have three plaintexts of the form (it is probable that we have such among the 216  </p>
+<p>texts by birthday paradox):  </p>
+<ul>
+<li>X1 = (x1, a, b, c)  </li>
+<li>X2 = (x2, a, b, c)  </li>
+<li>X3 = (x3, a, b, c)  </li>
+</ul>
+<p>We will study how a difference tuple (X1 ⊕ X2, X1 ⊕ X3) propagates through the cipher. Since it is a difference, it propagates through the key addition untouched. After <code>SubBytes</code> a set of possible difference tuples expands up to 28 elements. Since <code>MixColumn</code> is linear, any difference <code>(x, y)</code> propagates to <code>(MixColumn(x), MixColumn(y))</code>. Therefore, before the last <code>SubBytes</code> layer, we have only 28 possible differences, which can easily be precomputed. Thus, we can recover the last key byte-by-byte: guess byte of the key, decrypt through S-Box, check difference tuple (note that the middle <code>XK</code> does not affect it). We are truncating the differences of 32-bit values to differences of 8-bit values, but this is fine since we look at pairs of differences: 28 possible pairs out of 216 give us 1/28  </p>
+<p>filtration for each key byte. By tracking the first guessed key byte, we can ensure that only the correct key survives.  </p>
+<p>The full attack implementation is available <a href="http://mslc.ctf.su/wp-content/uploads/files/svalka/zer0llvm_aes.zip" target="_blank" rel="noopener">here</a>.  </p>
+<p>Recovering Seed  </p>
+<p>We have recovered the key, but the flag is the PRNG seed! How to recover it? The code for stream generation is as follows:  </p>
+<pre><code class="cpp">// in Oops::CryptoUtils::encrypt(Oops::CryptoUtils *this, unsigned __int8 *dst, unsigned __int8 *nonce, unsigned __int8 *seed)
+memset(dst, 0, 0x10uLL);
+v5 = *(nonce_ + 1);
+*buf = *nonce_;
+*buf2 = v5;
+for ( i = 0; i &lt;= 15; ++i ) {
+  seedbyte = seed_[i];
+  for ( j = 0; j &lt;= 7; ++j ) {
+    if ( seedbyte &amp; 1 ) {
+      for ( k = 0; k &lt;= 15; ++k )
+        dst[k] ^= buf[k];
+    }
+    seedbyte = seedbyte &gt;&gt; 1;
+    for ( l = 0; l &lt;= 15; ++l )
+      buf[l] = TABLE[buf[l]];
+  }
+}
+</code></pre>
+<p>Here <code>TABLE</code> is an 8-bit nonlinear S-Box. <code>Nonce</code> is constant and hardcoded (note that it is increased by 1 before calling encrypt, as a big-endian number, see  </p>
+<blockquote>
+<p>Oops::CryptoUtils::inc_ctr):  </p>
+</blockquote>
+<pre><code class="cpp">// in  Oops::CryptoUtils::prng_seed(struct CryptoUtils *cryptoutils, __int64 a2)
+noncebuf = cryptoutils-&gt;nonce;
+*noncebuf = 0xD7C59B4DFFD1E010LL;
+*(noncebuf + 1) = 0x20C7C17B250E019ALL;
+</code></pre>
+<p>Though TABLE is nonlinear, the buf array is updated independently and therefore we can see its different versions as constants. Mixing of buf and seed is done linearly, so we can recover the seed from the PRNG output (which is the AES key) by simple linear algebra:  </p>
+<pre><code class="python">from sage.all import *
+
+from struct import pack, unpack
+
+def tobin(x, n):
+    return tuple(map(int, bin(x).lstrip(&quot;0b&quot;).rjust(n, &quot;0&quot;)))
+
+def frombin(v):
+    return int(&quot;&quot;.join(map(str, v)), 2 )
+
+def tobinvec(v):
+    return sum( [tobin(c, 8) for c in v], () )
+
+PRNG_OUT = [179, 197, 140, 9, 31, 61, 9, 48, 214, 74, 172, 159, 200, 11, 185, 236]
+
+TABLE = [0x0ED,0x67,0x7F,0x0F6,0x0C7,0x9A,0x24,0x12,0x0BA,0x83,0x49,0x0DB,0x13,0x0BF,0x61,0x0B0,0x0FF,0x69,0x80,0x0EC,0x0DE,0x4,0x63,0x0C4,0x96,0x73,0x1B,0x6E,0x0A6,0x9E,0x87,0x4B,0x0FC,0x10,0x2A,0x0C3,0x5C,0x2E,0x36,0x0B2,0x0DF,0x0E3,0x90,0x0FE,0x1A,0x0F,0x1C,0x84,0x1,0x15,0x3A,0x85,0x0A5,0x57,0x3F,0x6D,0x0F5,0x4A,0x0A,0x0D6,0x9F,0x64,0x0B5,0x0F7,0x8F,0x99,0x68,0x4D,0x17,0x0F9,0x0EE,0x0F0,0x3,0x6,0x4C,0x0BD,0x58,0x33,0x0A9,0x0DC,0x3C,0x0A3,0x3B,0x0D1,0x0BB,0x28,0x0F4,0x0B9,0x0CF,0x47,0x0A0,0x6A,0x0C2,0x19,0x0B,0x97,0x81,0x35,0x91,0x7C,0x5D,0x7A,0x48,0x2B,0x41,0x0D9,0x0CB,0x6F,0x56,0x8D,0x5A,0x0C5,0x3E,0x0D8,0x0C0,0x60,0x1F,0x9,0x0CA,0x7B,0x25,0x0E7,0x0AE,0x0F2,0x77,0x0FA,0x3D,0x50,0x0E2,0x4F,0x0C9,0x2C,0x53,0x45,0x0C1,0x0E9,0x46,0x0D,0x70,0x8A,0x0A1,0x0D5,0x94,0x92,0x88,0x95,0x9D,0x26,0x9B,0x0E4,0x5,0x44,0x11,0x2D,0x7,0x1E,0x0A4,0x38,0x0E1,0x0A8,0x52,0x89,0x0AF,0x40,0x72,0x0E5,0x0B4,0x7E,0x51,0x6C,0x0FB,0x76,0x62,0x0D4,0x8,0x9C,0x54,0x5B,0x75,0x29,0x0C6,0x66,0x0DA,0x0FD,0x14,0x86,0x78,0x16,0x0B6,0x8B,0x39,0x0E6,0x0B7,0x1D,0x0D3,0x18,0x0A7,0x30,0x0E8,0x23,0x37,0x7D,0x82,0x0BE,0x34,0x0C,0x55,0x0D0,0x0EF,0x0,0x0CD,0x0AC,0x0A2,0x4E,0x0B3,0x0AB,0x31,0x8E,0x21,0x0E0,0x22,0x74,0x5E,0x8C,0x32,0x0F8,0x0EB,0x2F,0x79,0x0F1,0x42,0x0C8,0x0DD,0x0CE,0x65,0x27,0x5F,0x20,0x0B8,0x0AA,0x0AD,0x71,0x6B,0x0D2,0x0EA,0x0BC,0x0E,0x0CC,0x98,0x2,0x59,0x43,0x0B1,0x93,0x0D7,0x0F3,]
+
+# note 0x20... -&gt; 0x21
+nonce = pack(&quot;&lt;QQ&quot;, 0xD7C59B4DFFD1E010, 0x21C7C17B250E019A)
+
+cols = [map(ord, nonce)]
+for i in xrange(127):
+    v = [TABLE[c] for c in cols[-1]]
+    cols.append(v)
+cols = [vector(GF(2), tobinvec(v)) for v in cols]
+target = vector(GF(2), tobinvec(PRNG_OUT))
+
+m = matrix(GF(2), 128, len(cols))
+for x, c in enumerate(cols):
+    m.set_column(x, c)
+try:
+    sol = m.solve_right(target)
+except ValueError:
+    print &quot;NO SOLUTION&quot;
+    quit()
+
+print &quot;SOL&quot;, sol
+res = &quot;&quot;
+for i in xrange(0, 128, 8):
+    res += chr(frombin(sol[i:i+8][::-1]))
+print &quot;flag{%s}&quot; % res
+</code></pre>
+<blockquote>
+<p>转自hebini.me <a href="http://hebin.me/2018/01/24/%E8%A5%BF%E6%99%AEctf-zer0llvm/" target="_blank" rel="noopener">原链接</a></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/实验吧/" rel="tag"># 实验吧</a>
+          
+            <a href="/tags/逆向WP/" rel="tag"># 逆向WP</a>
+          
+            <a href="/tags/writeup/" rel="tag"># writeup</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/10/py137/" rel="next" title="py137">
+                <i class="fa fa-chevron-left"></i> py137
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/10/debug/" rel="prev" title="debug">
+                debug <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240" alt="液氮腾">
+            
+              <p class="site-author-name" itemprop="name">液氮腾</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">液氮腾</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
